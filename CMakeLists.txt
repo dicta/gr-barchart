@@ -150,6 +150,23 @@ if(NOT CPPUNIT_FOUND)
 endif()
 
 ########################################################################
+# Setup dependencies
+########################################################################
+include(GrBoost)
+
+find_package(Qt4 4.2.0 COMPONENTS QtCore QtGui)
+
+find_package(Qwt)
+
+find_package(PythonLibs 2)
+
+include(GrPython)
+GR_PYTHON_CHECK_MODULE("PyQt4" PyQt4 True PYQT4_FOUND)
+
+# populate the environment with QT variables
+include(GrSetupQt4)
+
+########################################################################
 # Setup doxygen option
 ########################################################################
 if(DOXYGEN_FOUND)
@@ -203,6 +220,22 @@ add_subdirectory(python)
 add_subdirectory(grc)
 add_subdirectory(apps)
 add_subdirectory(docs)
+
+########################################################################
+# Create Pkg Config File
+########################################################################
+set(PC_LIBS "${QWT_LIBRARIES} ${QT_LIBRARIES}")
+string(REPLACE ";" " " PC_LIBS_STR "${PC_LIBS}")
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/gnuradio-barchart.pc.in
+    ${CMAKE_CURRENT_BINARY_DIR}/gnuradio-barchart.pc
+@ONLY)
+
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/gnuradio-barchart.pc
+    DESTINATION ${GR_LIBRARY_DIR}/pkgconfig
+)
+
 
 ########################################################################
 # Install cmake search helper for this library
