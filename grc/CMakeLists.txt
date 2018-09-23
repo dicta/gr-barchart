@@ -19,5 +19,6 @@
 # Boston, MA 02110-1301, USA.
 
 install(FILES
+    barchart_vector_sink_f.xml
     DESTINATION share/gnuradio/grc/blocks
 )
