@@ -23,20 +23,54 @@
 ########################################################################
 include(GrPlatform) #define LIB_SUFFIX
 
-include_directories(${Boost_INCLUDE_DIR})
-link_directories(${Boost_LIBRARY_DIRS})
+include_directories(
+    ${Boost_INCLUDE_DIR}
+    ${QWT_INCLUDE_DIRS}
+    ${QT_INCLUDE_DIRS}
+)
 
+link_directories(
+    ${Boost_LIBRARY_DIRS}
+    ${QWT_LIBRARY_DIRS}
+    ${QT_LIBRARY_DIRS}
+)
+
+list(APPEND barchart_libs
+    ${GNURADIO_ALL_LIBRARIES}
+    ${Boost_LIBRARIES}
+    ${QWT_LIBRARIES}
+    ${QT_LIBRARIES}
+)
+
+# Set up Qt4 stuff for MOC/UIC code generation
+set(barchart_mod_includedir ${CMAKE_CURRENT_SOURCE_DIR}/../include/barchart)
+set(barchart_moc_hdrs
+    ${barchart_mod_includedir}/vectordisplayform.h
+    ${barchart_mod_includedir}/VectorDisplayPlot.h
+)
+include_directories(${barchart_mod_includedir})
+QT4_WRAP_CPP(barchart_moc_sources ${barchart_moc_hdrs})
+# Uncomment if we use any UI layouts defined by Qt Creator
+# QT4_WRAP_UI(barchart_ui_hdrs)
+
+# Now actually define the source files to build
 list(APPEND barchart_sources
+    ${barchart_moc_sources}
+    ${barchart_ui_hdrs}
+    VectorDisplayPlot.cc
+    vectordisplayform.cc
+    vector_sink_f_impl.cc
 )
 
 set(barchart_sources "${barchart_sources}" PARENT_SCOPE)
 if(NOT barchart_sources)
-	MESSAGE(STATUS "No C++ sources... skipping lib/")
-	return()
+    MESSAGE(STATUS "No C++ sources... skipping lib/")
+    return()
 endif(NOT barchart_sources)
 
+add_definitions(-DQWT_DLL)
 add_library(gnuradio-barchart SHARED ${barchart_sources})
-target_link_libraries(gnuradio-barchart ${Boost_LIBRARIES} ${GNURADIO_ALL_LIBRARIES})
+target_link_libraries(gnuradio-barchart ${barchart_libs})
 set_target_properties(gnuradio-barchart PROPERTIES DEFINE_SYMBOL "gnuradio_barchart_EXPORTS")
 
 if(APPLE)
@@ -66,11 +100,11 @@ list(APPEND test_barchart_sources
 add_executable(test-barchart ${test_barchart_sources})
 
 target_link_libraries(
-  test-barchart
-  ${GNURADIO_RUNTIME_LIBRARIES}
-  ${Boost_LIBRARIES}
-  ${CPPUNIT_LIBRARIES}
-  gnuradio-barchart
+    test-barchart
+    ${GNURADIO_RUNTIME_LIBRARIES}
+    ${Boost_LIBRARIES}
+    ${CPPUNIT_LIBRARIES}
+    gnuradio-barchart
 )
 
 GR_ADD_TEST(test_barchart test-barchart)
@@ -80,4 +114,3 @@ GR_ADD_TEST(test_barchart test-barchart)
 ########################################################################
 message(STATUS "Using install prefix: ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "Building for version: ${VERSION} / ${LIBVER}")
-

@@ -8,6 +8,9 @@
 %include "barchart_swig_doc.i"
 
 %{
+#include "barchart/vector_sink_f.h"
 %}
 
+%include "barchart/vector_sink_f.h"
 
+GR_SWIG_BLOCK_MAGIC2(barchart, vector_sink_f);

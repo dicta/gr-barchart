@@ -23,5 +23,8 @@
 ########################################################################
 install(FILES
     api.h
+    vectordisplayform.h
+    VectorDisplayPlot.h
+    vector_sink_f.h
     DESTINATION include/barchart
 )
