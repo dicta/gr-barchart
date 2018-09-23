@@ -2,7 +2,7 @@
 /*
  * Copyright 2012,2014 Free Software Foundation, Inc.
  *
- * This file is part of GNU Radio
+ * This file is a part of gr-barchart
  *
  * GNU Radio is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,40 +20,39 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef INCLUDED_QTGUI_VECTOR_SINK_F_H
-#define INCLUDED_QTGUI_VECTOR_SINK_F_H
+#ifndef INCLUDED_BARCHART_VECTOR_SINK_F_H
+#define INCLUDED_BARCHART_VECTOR_SINK_F_H
 
 #ifdef ENABLE_PYTHON
 #include <Python.h>
 #endif
 
-#include <gnuradio/qtgui/api.h>
+#include <barchart/api.h>
 #include <gnuradio/sync_block.h>
 #include <qapplication.h>
 
 namespace gr {
-  namespace qtgui {
+  namespace barchart {
 
     /*!
-     * \brief A graphical sink to display multiple vector-based signals.
-     * \ingroup instrumentation_blk
-     * \ingroup qtgui_blk
+     * \brief A graphical sink to display a signal as a bar chart.
      *
      * \details
-     * This is a QT-based graphical sink that plots vectors of data as-is.
-     * Each signal is plotted with a different color, and the set_title()
-     * and set_color() functions can be used to change the label and color
-     * for a given input number.
+     * This is a QT-based graphical sink that plots frames of data using bars.
+     * Each frame of data is assumed to be an entire complete plot and will
+     * replace any currently existing data. The set_label() and set_color()
+     * functions can be used to change the label and color for a given input
+     * number, which corresponds to a sample number within the frame.
      *
      * To specify units for the x- and y-axes, use the set_x_axis_units()
      * and set_y_axis_units() functions. This does not change the x- and
      * y-labels, which are either specified during construction, or by
      * calling the set_x_axis_label() and set_y_axis_label() methods.
      */
-    class QTGUI_API vector_sink_f : virtual public sync_block
+    class BARCHART_API vector_sink_f : virtual public sync_block
     {
     public:
-      // gr::qtgui::vector_sink_f::sptr
+      // gr::barchart::vector_sink_f::sptr
       typedef boost::shared_ptr<vector_sink_f> sptr;
 
       /*!
@@ -72,11 +71,11 @@ namespace gr {
           int vlen,
           double x_start,
           double x_step,
-          const std::string &x_axis_label,
-          const std::string &y_axis_label,
-          const std::string &name,
+          const std::string& x_axis_label,
+          const std::string& y_axis_label,
+          const std::string& name,
           int nconnections=1,
-          QWidget *parent=NULL
+          QWidget* parent=nullptr
       );
 
       virtual void exec_() = 0;
@@ -135,10 +134,10 @@ namespace gr {
       virtual void clear_min_hold() = 0;
       virtual void reset() = 0;
 
-      QApplication *d_qApplication;
+      QApplication* d_qApplication;
     };
 
-  } /* namespace qtgui */
+} /* namespace barchart */
 } /* namespace gr */
 
-#endif /* INCLUDED_QTGUI_VECTOR_SINK_F_H */
+#endif /* INCLUDED_BARCHART_VECTOR_SINK_F_H */

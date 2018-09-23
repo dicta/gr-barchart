@@ -45,6 +45,8 @@ list(APPEND barchart_libs
 # Set up Qt4 stuff for MOC/UIC code generation
 set(barchart_mod_includedir ${CMAKE_CURRENT_SOURCE_DIR}/../include/barchart)
 set(barchart_moc_hdrs
+    ${barchart_mod_includedir}/displayform.h
+    ${barchart_mod_includedir}/DisplayPlot.h
     ${barchart_mod_includedir}/vectordisplayform.h
     ${barchart_mod_includedir}/VectorDisplayPlot.h
 )
@@ -57,6 +59,8 @@ QT4_WRAP_CPP(barchart_moc_sources ${barchart_moc_hdrs})
 list(APPEND barchart_sources
     ${barchart_moc_sources}
     ${barchart_ui_hdrs}
+    displayform.cc
+    DisplayPlot.cc
     VectorDisplayPlot.cc
     vectordisplayform.cc
     vector_sink_f_impl.cc

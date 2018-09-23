@@ -2,7 +2,7 @@
 /*
  * Copyright 2014 Free Software Foundation, Inc.
  *
- * This file is part of GNU Radio
+ * This file is part of gr-barchart
  *
  * GNU Radio is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,18 +23,18 @@
 #ifndef VECTOR_DISPLAY_FORM_H
 #define VECTOR_DISPLAY_FORM_H
 
-#include <gnuradio/qtgui/spectrumUpdateEvents.h>
-#include <gnuradio/qtgui/VectorDisplayPlot.h>
-#include <QtGui/QtGui>
-#include <vector>
+#include "barchart/VectorDisplayPlot.h"
 
-#include <gnuradio/qtgui/displayform.h>
+#include <vector>
+#include <QtGui/QtGui>
+
+#include "barchart/displayform.h"
 
 /*!
  * \brief DisplayForm child for managing vector plots.
  * \ingroup qtgui_blk
  */
-class VectorDisplayForm : public DisplayForm
+class VectorDisplayForm : public gr::barchart::DisplayForm
 {
   Q_OBJECT
 

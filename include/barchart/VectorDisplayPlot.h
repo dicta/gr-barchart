@@ -23,16 +23,17 @@
 #ifndef VECTOR_DISPLAY_PLOT_HPP
 #define VECTOR_DISPLAY_PLOT_HPP
 
-#include <stdint.h>
+#include <cstdint>
 #include <cstdio>
 #include <vector>
-#include <gnuradio/qtgui/DisplayPlot.h>
+
+#include "barchart/DisplayPlot.h"
 
 /*!
  * \brief QWidget for displaying 1D-vector plots.
  * \ingroup qtgui_blk
  */
-class VectorDisplayPlot: public DisplayPlot
+class VectorDisplayPlot : public gr::barchart::DisplayPlot
 {
   Q_OBJECT
 
