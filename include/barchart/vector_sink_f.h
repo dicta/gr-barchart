@@ -29,7 +29,11 @@
 
 #include <barchart/api.h>
 #include <gnuradio/sync_block.h>
-#include <qapplication.h>
+
+
+class QApplication;
+class QWidget;
+
 
 namespace gr {
   namespace barchart {

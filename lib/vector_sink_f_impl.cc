@@ -148,8 +148,10 @@ namespace gr {
         d_qApplication = new QApplication(d_argc, &d_argv);
       }
 
+#if 0 // FIXME enable stylesheet stuff later
       // If a style sheet is set in the prefs file, enable it here.
       check_set_qss(d_qApplication);
+#endif
 
       d_main_gui = new VectorDisplayForm(d_nconnections, d_parent);
       d_main_gui->setVecSize(d_vlen);
