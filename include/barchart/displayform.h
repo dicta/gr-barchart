@@ -80,8 +80,6 @@ public slots:
   QwtSymbol::Style lineMarker(int which);
   int markerAlpha(int which);
 
-  virtual void setSampleRate(const QString &rate);
-
   void setStop(bool on);
   void setStop();
 
@@ -128,14 +126,7 @@ protected:
   bool d_autoscale_state;
 
   QList<QMenu*> d_lines_menu;
-  QList<LineTitleAction*> d_line_title_act;
-  QList<LineColorMenu*> d_line_color_menu;
-  QList<LineWidthMenu*> d_line_width_menu;
-  QList<LineStyleMenu*> d_line_style_menu;
-  QList<LineMarkerMenu*> d_line_marker_menu;
-  QList<MarkerAlphaMenu*> d_marker_alpha_menu;
 
-  PopupMenu *d_samp_rate_act;
   QAction *d_save_act;
 
   double d_update_time;

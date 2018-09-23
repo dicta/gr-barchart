@@ -20,8 +20,8 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef VECTOR_DISPLAY_FORM_H
-#define VECTOR_DISPLAY_FORM_H
+#ifndef BARCHART_VECTOR_DISPLAY_FORM_H
+#define BARCHART_VECTOR_DISPLAY_FORM_H
 
 #include "barchart/VectorDisplayPlot.h"
 
@@ -29,6 +29,9 @@
 #include <QtGui/QtGui>
 
 #include "barchart/displayform.h"
+
+namespace gr {
+namespace barchart {
 
 /*!
  * \brief DisplayForm child for managing vector plots.
@@ -61,7 +64,6 @@ public slots:
   void customEvent(QEvent *e);
 
   void setVecSize(const int);
-  void setVecAverage(const float);
 
   void setXaxis(double start, double step);
   void setYaxis(double min, double max);
@@ -87,8 +89,11 @@ private:
   bool d_clicked;
   double d_clicked_x_level;
 
-  AverageMenu *d_avgmenu;
   QAction *d_clearmin_act, *d_clearmax_act;
 };
 
-#endif /* VECTOR_DISPLAY_FORM_H */
+
+} // end namespace barchart
+} // end namespace gr
+
+#endif /* BARCHART_VECTOR_DISPLAY_FORM_H */

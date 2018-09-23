@@ -20,10 +20,16 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include <gnuradio/qtgui/displayform.h>
+#include "barchart/displayform.h"
+
 #include <iostream>
 #include <QPixmap>
 #include <QFileDialog>
+
+
+namespace gr {
+namespace barchart {
+
 
 DisplayForm::DisplayForm(int nplots, QWidget* parent)
   : QWidget(parent), d_nplots(nplots), d_system_specified_flag(false)
@@ -66,58 +72,6 @@ DisplayForm::DisplayForm(int nplots, QWidget* parent)
   d_menu->addAction(d_stop_act);
   d_menu->addAction(d_grid_act);
   d_menu->addAction(d_axislabelsmenu);
-
-  for(int i = 0; i < d_nplots; i++) {
-    d_line_title_act.push_back(new LineTitleAction(i, this));
-    d_line_color_menu.push_back(new LineColorMenu(i, this));
-    d_line_width_menu.push_back(new LineWidthMenu(i, this));
-    d_line_style_menu.push_back(new LineStyleMenu(i, this));
-    d_line_marker_menu.push_back(new LineMarkerMenu(i, this));
-    d_marker_alpha_menu.push_back(new MarkerAlphaMenu(i, this));
-
-    connect(d_line_title_act[i], SIGNAL(whichTrigger(int, const QString&)),
-	    this, SLOT(setLineLabel(int, const QString&)));
-
-    for(int j = 0; j < d_line_color_menu[i]->getNumActions(); j++) {
-      connect(d_line_color_menu[i], SIGNAL(whichTrigger(int, const QString&)),
-	      this, SLOT(setLineColor(int, const QString&)));
-    }
-
-    for(int j = 0; j < d_line_width_menu[i]->getNumActions(); j++) {
-      connect(d_line_width_menu[i], SIGNAL(whichTrigger(int, int)),
-	      this, SLOT(setLineWidth(int, int)));
-    }
-
-    for(int j = 0; j < d_line_style_menu[i]->getNumActions(); j++) {
-      connect(d_line_style_menu[i], SIGNAL(whichTrigger(int, Qt::PenStyle)),
-	      this, SLOT(setLineStyle(int, Qt::PenStyle)));
-    }
-
-    for(int j = 0; j < d_line_marker_menu[i]->getNumActions(); j++) {
-      connect(d_line_marker_menu[i], SIGNAL(whichTrigger(int, QwtSymbol::Style)),
-	      this, SLOT(setLineMarker(int, QwtSymbol::Style)));
-    }
-
-    for(int j = 0; j < d_marker_alpha_menu[i]->getNumActions(); j++) {
-      connect(d_marker_alpha_menu[i], SIGNAL(whichTrigger(int, int)),
-	      this, SLOT(setMarkerAlpha(int, int)));
-    }
-
-    d_lines_menu.push_back(new QMenu(tr(""), this));
-    d_lines_menu[i]->addAction(d_line_title_act[i]);
-    d_lines_menu[i]->addMenu(d_line_color_menu[i]);
-    d_lines_menu[i]->addMenu(d_line_width_menu[i]);
-    d_lines_menu[i]->addMenu(d_line_style_menu[i]);
-    d_lines_menu[i]->addMenu(d_line_marker_menu[i]);
-    d_lines_menu[i]->addMenu(d_marker_alpha_menu[i]);
-    d_menu->addMenu(d_lines_menu[i]);
-  }
-
-  d_samp_rate_act = new PopupMenu("Sample Rate", this);
-  d_samp_rate_act->setStatusTip(tr("Set Sample Rate"));
-  connect(d_samp_rate_act, SIGNAL(whichTrigger(QString)),
-	  this, SLOT(setSampleRate(QString)));
-  d_menu->addAction(d_samp_rate_act);
 
   d_autoscale_act = new QAction("Auto Scale", this);
   d_autoscale_act->setStatusTip(tr("Autoscale Plot"));
@@ -301,10 +255,6 @@ DisplayForm::markerAlpha(int which)
   return d_display_plot->getMarkerAlpha(which);
 }
 
-void
-DisplayForm::setSampleRate(const QString &rate)
-{
-}
 
 void
 DisplayForm::setStop(bool on)
@@ -396,3 +346,7 @@ DisplayForm::disableLegend()
 {
   d_display_plot->disableLegend();
 }
+
+
+} // end namespace barchart
+} // end namespace gr

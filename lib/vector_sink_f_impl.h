@@ -20,15 +20,18 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef INCLUDED_QTGUI_VECTOR_SINK_F_IMPL_H
-#define INCLUDED_QTGUI_VECTOR_SINK_F_IMPL_H
+#ifndef BARCHART_VECTOR_SINK_F_IMPL_H
+#define BARCHART_VECTOR_SINK_F_IMPL_H
 
-#include <gnuradio/qtgui/vector_sink_f.h>
+#include "barchart/vector_sink_f.h"
+
 #include <gnuradio/high_res_timer.h>
-#include <gnuradio/qtgui/vectordisplayform.h>
+
+#include "barchart/api.h"
+#include "barchart/vectordisplayform.h"
 
 namespace gr {
-  namespace qtgui {
+  namespace barchart {
 
     class QTGUI_API vector_sink_f_impl : public vector_sink_f
     {
@@ -50,8 +53,7 @@ namespace gr {
       const pmt::pmt_t d_port;
       const pmt::pmt_t d_msg; //< Key of outgoing messages
 
-      std::vector<double*> d_magbufs;
-
+      std::vector<std::vector<double>> d_magbufs;
 
       int d_argc;
       char *d_argv;
@@ -93,8 +95,6 @@ namespace gr {
 #endif
 
       int vlen() const;
-      void set_vec_average(const float avg);
-      float vec_average() const;
 
       void set_frequency_range(const double centerfreq, const double bandwidth);
       void set_x_axis(const double start, const double step);
@@ -138,7 +138,7 @@ namespace gr {
 	       gr_vector_void_star &output_items);
     };
 
-  } /* namespace qtgui */
+} /* namespace barchart */
 } /* namespace gr */
 
-#endif /* INCLUDED_QTGUI_VECTOR_SINK_F_IMPL_H */
+#endif /* BARCHART_VECTOR_SINK_F_IMPL_H */

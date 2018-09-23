@@ -23,6 +23,7 @@
 ########################################################################
 install(FILES
     api.h
+    DataUpdateEvent.h
     displayform.h
     DisplayPlot.h
     vectordisplayform.h

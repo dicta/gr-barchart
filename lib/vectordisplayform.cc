@@ -20,10 +20,16 @@
  * Boston, MA 02110-1301, USA.
  */
 
+#include "barchart/vectordisplayform.h"
+
 #include <cmath>
-#include <QMessageBox>
-#include <gnuradio/qtgui/vectordisplayform.h>
 #include <iostream>
+#include <QMessageBox>
+
+#include "barchart/DataUpdateEvent.h"
+
+namespace gr {
+namespace barchart {
 
 VectorDisplayForm::VectorDisplayForm(int nplots, QWidget* parent)
   : DisplayForm(nplots, parent)
@@ -42,21 +48,6 @@ VectorDisplayForm::VectorDisplayForm(int nplots, QWidget* parent)
   d_ref_level = 0.0;
   d_clicked = false;
   d_clicked_x_level = 0;
-
-  d_avgmenu = new AverageMenu("Average", this);
-  d_menu->addMenu(d_avgmenu);
-  connect(d_avgmenu, SIGNAL(whichTrigger(float)),
-	  this, SLOT(setVecAverage(const float)));
-
-  PopupMenu *maxymenu = new PopupMenu("Y Max", this);
-  d_menu->addAction(maxymenu);
-  connect(maxymenu, SIGNAL(whichTrigger(QString)),
-	  this, SLOT(setYMax(QString)));
-
-  PopupMenu *minymenu = new PopupMenu("Y Min", this);
-  d_menu->addAction(minymenu);
-  connect(minymenu, SIGNAL(whichTrigger(QString)),
-	  this, SLOT(setYMin(QString)));
 
   d_clearmax_act = new QAction("Clear Max", this);
   d_menu->addAction(d_clearmax_act);
@@ -90,13 +81,11 @@ VectorDisplayForm::getPlot()
 void
 VectorDisplayForm::newData(const QEvent *updateEvent)
 {
-  FreqUpdateEvent *fevent = (FreqUpdateEvent*)updateEvent;
-  const std::vector<double*> dataPoints = fevent->getPoints();
-  const uint64_t numDataPoints = fevent->getNumDataPoints();
+  DataUpdateEvent *fevent = (DataUpdateEvent*)updateEvent;
 
   getPlot()->plotNewData(
-      dataPoints,
-      numDataPoints,
+      fevent->getPoints(),
+      fevent->getNumDataPoints(),
       d_ref_level,
       d_update_time
   );
@@ -105,8 +94,8 @@ VectorDisplayForm::newData(const QEvent *updateEvent)
 void
 VectorDisplayForm::customEvent( QEvent * e)
 {
-  // We just re-use FreqUpdateEvent as long as that works
-  if(e->type() == FreqUpdateEvent::Type()) {
+  // We just re-use DataUpdateEvent as long as that works
+  if(e->type() == DataUpdateEvent::Type()) {
     newData(e);
   }
 }
@@ -142,14 +131,6 @@ void
 VectorDisplayForm::setVecSize(const int newsize)
 {
   d_vecsize = newsize;
-  getPlot()->replot();
-}
-
-void
-VectorDisplayForm::setVecAverage(const float newavg)
-{
-  d_vecavg = newavg;
-  d_avgmenu->getActionFromAvg(newavg)->setChecked(true);
   getPlot()->replot();
 }
 
@@ -233,3 +214,6 @@ VectorDisplayForm::getClickedXVal() const
 {
   return d_clicked_x_level;
 }
+
+} // end namespace barchart
+} // end namespace gr

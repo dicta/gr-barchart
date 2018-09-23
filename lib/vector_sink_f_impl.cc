@@ -24,15 +24,18 @@
 #include <config.h>
 #endif
 
+#include <string>
+#include <vector>
+
 #include "vector_sink_f_impl.h"
 #include <gnuradio/io_signature.h>
 #include <gnuradio/prefs.h>
-#include <string.h>
-#include <volk/volk.h>
 #include <qwt_symbol.h>
 
+#include "barchart/DataUpdateEvent.h"
+
 namespace gr {
-  namespace qtgui {
+  namespace barchart {
 
     static const std::string MSG_PORT_OUT_XVAL = "xval";
 
@@ -95,9 +98,10 @@ namespace gr {
 
       d_main_gui = NULL;
 
+      d_magbufs.clear();
+      d_magbufs.resize(d_nconnections);
       for(int i = 0; i < d_nconnections; i++) {
-        d_magbufs.push_back((double*)volk_malloc(d_vlen*sizeof(double), volk_get_alignment()));
-        memset(d_magbufs[i], 0, d_vlen*sizeof(double));
+          d_magbufs[i].resize(d_vlen, 0x0);
       }
 
       initialize(
@@ -115,10 +119,7 @@ namespace gr {
         d_main_gui->close();
       }
 
-      for(int i = 0; i < d_nconnections; i++) {
-        volk_free(d_magbufs[i]);
-      }
-
+      d_magbufs.clear();
       delete d_argv;
     }
 
@@ -195,23 +196,6 @@ namespace gr {
     vector_sink_f_impl::vlen() const
     {
       return d_vlen;
-    }
-
-    void
-    vector_sink_f_impl::set_vec_average(const float avg)
-    {
-      if (avg < 0 || avg > 1.0) {
-        GR_LOG_ALERT(d_logger, "Invalid average value received in set_vec_average(), must be within [0, 1].");
-        return;
-      }
-      d_main_gui->setVecAverage(avg);
-      d_vecavg = avg;
-    }
-
-    float
-    vector_sink_f_impl::vec_average() const
-    {
-      return d_vecavg;
     }
 
     void
@@ -419,11 +403,11 @@ namespace gr {
             for(int n = 0; n < d_nconnections; n++) {
               in = ((const float*)input_items[n]) + d_vlen;
               for(int x = 0; x < d_vlen; x++) {
-                d_magbufs[n][x] = (double)((1.0-d_vecavg)*d_magbufs[n][x] + (d_vecavg)*in[x]);
+                d_magbufs[n][x] = in[x];
               }
             }
             d_last_time = gr::high_res_timer_now();
-            d_qApplication->postEvent(d_main_gui, new FreqUpdateEvent(d_magbufs, d_vlen));
+            d_qApplication->postEvent(d_main_gui, new DataUpdateEvent(d_magbufs));
           }
         }
 

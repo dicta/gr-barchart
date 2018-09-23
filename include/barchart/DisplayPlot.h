@@ -54,6 +54,10 @@ Q_DECLARE_METATYPE ( QColorList )
 #include <qwt_legend_label.h>
 #endif /* QWT_VERSION < 0x060100 */
 
+
+#include "barchart/api.h"
+
+
 namespace gr {
 namespace barchart {
 
@@ -61,7 +65,7 @@ namespace barchart {
  * \brief QWidget base plot to build QTGUI plotting tools.
  * \ingroup qtgui_blk
  */
-class DisplayPlot : public QwtPlot
+class BARCHART_API DisplayPlot : public QwtPlot
 {
   Q_OBJECT
 

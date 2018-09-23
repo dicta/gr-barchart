@@ -88,8 +88,6 @@ namespace gr {
 #endif
 
       virtual int vlen() const = 0;
-      virtual void set_vec_average(const float avg) = 0;
-      virtual float vec_average() const = 0;
 
       //! Update the values on the x-Axis.
       //
