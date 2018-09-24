@@ -27,26 +27,16 @@
 #include <cstdio>
 #include <vector>
 
-#include "barchart/DisplayPlot.h"
+#include "barchart/api.h"
+#include "qcustomplot/qcustomplot.h"
 
 /*!
  * \brief QWidget for displaying 1D-vector plots.
  * \ingroup qtgui_blk
  */
-class VectorDisplayPlot : public gr::barchart::DisplayPlot
+class BARCHART_API VectorDisplayPlot : public QCustomPlot
 {
-  Q_OBJECT
-
-  Q_PROPERTY ( QColor min_vec_color READ getMinVecColor WRITE setMinVecColor )
-  Q_PROPERTY ( QColor max_vec_color READ getMaxVecColor WRITE setMaxVecColor )
-  Q_PROPERTY ( bool min_vec_visible READ getMinVecVisible WRITE setMinVecVisible )
-  Q_PROPERTY ( bool max_vec_visible READ getMaxVecVisible WRITE setMaxVecVisible )
-  Q_PROPERTY ( QColor marker_lower_intensity_color READ getMarkerLowerIntensityColor WRITE setMarkerLowerIntensityColor )
-  Q_PROPERTY ( bool marker_lower_intensity_visible READ getMarkerLowerIntensityVisible WRITE setMarkerLowerIntensityVisible )
-  Q_PROPERTY ( QColor marker_upper_intensity_color READ getMarkerUpperIntensityColor WRITE setMarkerUpperIntensityColor )
-  Q_PROPERTY ( bool marker_upper_intensity_visible READ getMarkerUpperIntensityVisible WRITE setMarkerUpperIntensityVisible )
-  Q_PROPERTY ( QColor marker_ref_level_color READ getMarkerRefLevelAmplitudeColor WRITE setMarkerRefLevelAmplitudeColor )
-  Q_PROPERTY ( bool marker_ref_level_visible READ getMarkerRefLevelAmplitudeVisible WRITE setMarkerRefLevelAmplitudeVisible )
+Q_OBJECT
 
 public:
   VectorDisplayPlot(int nplots, QWidget*);
@@ -61,12 +51,9 @@ public:
       const double timeInterval
   );
 
-  void clearMaxData();
-  void clearMinData();
+  QString getTitle() const;
+  void setTitle(const QString title);
 
-  void replot();
-
-  void setYaxis(double min, double max);
   double getYMin() const;
   double getYMax() const;
 
@@ -79,34 +66,24 @@ public:
   void setTraceColour (QColor);
   void setBGColour (QColor c);
 
-  const bool getMaxVecVisible() const;
-  const bool getMinVecVisible() const;
-  const QColor getMinVecColor() const;
-  const QColor getMaxVecColor() const;
-  const QColor getMarkerLowerIntensityColor () const;
-  const bool getMarkerLowerIntensityVisible () const;
-  const QColor getMarkerUpperIntensityColor () const;
-  const bool getMarkerUpperIntensityVisible () const;
-  const bool getMarkerRefLevelAmplitudeVisible () const;
-  const QColor getMarkerRefLevelAmplitudeColor () const;
-
 public slots:
-  void setMaxVecVisible(const bool);
-  void setMinVecVisible(const bool);
-  void setMinVecColor (QColor c);
-  void setMaxVecColor (QColor c);
-  void setMarkerLowerIntensityColor (QColor c);
-  void setMarkerLowerIntensityVisible (bool visible);
-  void setMarkerUpperIntensityColor (QColor c);
-  void setMarkerUpperIntensityVisible (bool visible);
-  void setMarkerRefLevelAmplitudeVisible (bool visible);
-  void setMarkerRefLevelAmplitudeColor (QColor c);
 
-  void setLowerIntensityLevel(const double);
-  void setUpperIntensityLevel(const double);
+  void setStop(bool on);
 
-  void onPickerPointSelected(const QwtDoublePoint & p);
-  void onPickerPointSelected6(const QPointF & p);
+  virtual void disableLegend();
+  virtual void setAxisLabels(bool en);
+  virtual void setYaxis(double min, double max);
+  virtual void setXaxis(double min, double max);
+  virtual void setLineLabel(int which, QString label);
+  virtual QString getLineLabel(int which);
+  virtual void setLineColor(int which, QColor color);
+  virtual QColor getLineColor(int which) const;
+  virtual void setLineWidth(int which, int width);
+  virtual int getLineWidth(int which) const;
+  virtual void setLineStyle(int which, Qt::PenStyle style);
+  virtual const Qt::PenStyle getLineStyle(int which) const;
+  virtual void setMarkerAlpha(int which, int alpha);
+  virtual int getMarkerAlpha(int which) const;
 
   void setAutoScale(bool state);
 
@@ -114,20 +91,10 @@ private:
   void _resetXAxisPoints();
   void _autoScale(double bottom, double top);
 
-  std::vector<std::vector<double>> d_ydata;
+  int d_nplots;
+  int64_t d_numPoints;
 
-  QwtPlotCurve* d_min_vec_plot_curve;
-  QwtPlotCurve* d_max_vec_plot_curve;
-  QColor d_min_vec_color;
-  bool d_min_vec_visible;
-  QColor d_max_vec_color;
-  bool d_max_vec_visible;
-  QColor d_marker_lower_intensity_color;
-  bool d_marker_lower_intensity_visible;
-  QColor d_marker_upper_intensity_color;
-  bool d_marker_upper_intensity_visible;
-  QColor d_marker_ref_level_color;
-  bool d_marker_ref_level_visible;
+  std::vector<std::vector<double>> d_ydata;
 
   double d_x_axis_start;
   double d_x_axis_step;
@@ -135,18 +102,17 @@ private:
   double d_ymax;
   double d_ymin;
 
-  QwtPlotMarker* d_lower_intensity_marker;
-  QwtPlotMarker* d_upper_intensity_marker;
-
-  QwtPlotMarker *d_marker_ref_level;
-
   std::vector<double> d_xdata;
 
   QString d_x_axis_label;
   QString d_y_axis_label;
 
-  std::vector<double> d_min_vec_data;
-  std::vector<double> d_max_vec_data;
+  QCPTextElement* d_graph_title;
+
+  bool d_stop;
+  bool d_autoscale_state;
+
+  QList<QColor> d_trace_colors;
 
   double d_ref_level;
 };

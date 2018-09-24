@@ -40,12 +40,14 @@ DisplayForm::DisplayForm(int nplots, QWidget* parent)
   // Set the initial plot size
   resize(QSize(800, 600));
 
+#if 0
   // Set up a grid that can be turned on/off
   d_grid = new QwtPlotGrid();
   QPen *gridpen = new QPen(Qt::DashLine);
   gridpen->setWidthF(0.25);
   gridpen->setColor(Qt::gray);
   d_grid->setPen(*gridpen);
+#endif
 
   // Create a set of actions for the menu
   d_stop_act = new QAction("Stop", this);
@@ -125,7 +127,7 @@ DisplayForm::mousePressEvent( QMouseEvent * e)
 void
 DisplayForm::updateGuiTimer()
 {
-  d_display_plot->canvas()->update();
+  d_display_plot->update();
 }
 
 void
@@ -200,13 +202,6 @@ DisplayForm::setLineStyle(int which, Qt::PenStyle style)
 }
 
 void
-DisplayForm::setLineMarker(int which, QwtSymbol::Style marker)
-{
-  d_display_plot->setLineMarker(which, marker);
-  d_display_plot->replot();
-}
-
-void
 DisplayForm::setMarkerAlpha(int which, int alpha)
 {
   d_display_plot->setMarkerAlpha(which, alpha);
@@ -216,7 +211,7 @@ DisplayForm::setMarkerAlpha(int which, int alpha)
 QString
 DisplayForm::title()
 {
-  return d_display_plot->title().text();
+  return d_display_plot->getTitle();
 }
 
 QString
@@ -241,12 +236,6 @@ Qt::PenStyle
 DisplayForm::lineStyle(int which)
 {
   return d_display_plot->getLineStyle(which);
-}
-
-QwtSymbol::Style
-DisplayForm::lineMarker(int which)
-{
-  return d_display_plot->getLineMarker(which);
 }
 
 int
@@ -283,15 +272,8 @@ DisplayForm::setStop()
 void
 DisplayForm::setGrid(bool on)
 {
-  if(on) {
-    // will auto-detach if already attached.
-    d_grid->attach(d_display_plot);
-    d_grid_state = true;
-  }
-  else {
-    d_grid->detach();
-    d_grid_state = false;
-  }
+  // FIXME reimplement
+  d_grid_state = on;
   d_grid_act->setChecked(on);
   d_display_plot->replot();
 }

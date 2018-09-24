@@ -283,12 +283,6 @@ namespace gr {
     }
 
     void
-    vector_sink_f_impl::set_line_marker(int which, int marker)
-    {
-      d_main_gui->setLineMarker(which, (QwtSymbol::Style)marker);
-    }
-
-    void
     vector_sink_f_impl::set_line_alpha(int which, double alpha)
     {
       d_main_gui->setMarkerAlpha(which, (int)(255.0*alpha));
@@ -330,12 +324,6 @@ namespace gr {
       return d_main_gui->lineStyle(which);
     }
 
-    int
-    vector_sink_f_impl::line_marker(int which)
-    {
-      return d_main_gui->lineMarker(which);
-    }
-
     double
     vector_sink_f_impl::line_alpha(int which)
     {
@@ -358,18 +346,6 @@ namespace gr {
     vector_sink_f_impl::enable_autoscale(bool en)
     {
       d_main_gui->autoScale(en);
-    }
-
-    void
-    vector_sink_f_impl::clear_max_hold()
-    {
-      d_main_gui->clearMaxHold();
-    }
-
-    void
-    vector_sink_f_impl::clear_min_hold()
-    {
-      d_main_gui->clearMinHold();
     }
 
     void

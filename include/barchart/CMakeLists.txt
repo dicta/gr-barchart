@@ -25,7 +25,6 @@ install(FILES
     api.h
     DataUpdateEvent.h
     displayform.h
-    DisplayPlot.h
     vectordisplayform.h
     VectorDisplayPlot.h
     vector_sink_f.h

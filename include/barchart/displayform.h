@@ -28,11 +28,8 @@
 #include <QtGui/QtGui>
 #include <vector>
 
-#include <qwt_plot_grid.h>
-#include <qwt_plot_layout.h>
-
 #include "barchart/api.h"
-#include "barchart/DisplayPlot.h"
+#include "barchart/VectorDisplayPlot.h"
 
 namespace gr {
 namespace barchart {
@@ -49,7 +46,7 @@ class BARCHART_API DisplayForm : public QWidget
   DisplayForm(int nplots=1, QWidget* parent = 0);
   ~DisplayForm();
 
-  virtual DisplayPlot* getPlot() = 0;
+  virtual VectorDisplayPlot* getPlot() = 0;
   void Reset();
   bool isClosed() const;
 
@@ -69,7 +66,6 @@ public slots:
   void setLineColor(int which, const QString &color);
   void setLineWidth(int which, int width);
   void setLineStyle(int which, Qt::PenStyle style);
-  void setLineMarker(int which, QwtSymbol::Style style);
   void setMarkerAlpha(int which, int alpha);
 
   QString title();
@@ -77,7 +73,6 @@ public slots:
   QString lineColor(int which);
   int lineWidth(int which);
   Qt::PenStyle lineStyle(int which);
-  QwtSymbol::Style lineMarker(int which);
   int markerAlpha(int which);
 
   void setStop(bool on);
@@ -107,10 +102,8 @@ protected:
   int d_nplots;
 
   QGridLayout *d_layout;
-  DisplayPlot* d_display_plot;
+  VectorDisplayPlot* d_display_plot;
   bool d_system_specified_flag;
-
-  QwtPlotGrid *d_grid;
 
   bool   d_menu_on;
   QMenu *d_menu;

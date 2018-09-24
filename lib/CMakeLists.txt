@@ -46,9 +46,9 @@ list(APPEND barchart_libs
 set(barchart_mod_includedir ${CMAKE_CURRENT_SOURCE_DIR}/../include/barchart)
 set(barchart_moc_hdrs
     ${barchart_mod_includedir}/displayform.h
-    ${barchart_mod_includedir}/DisplayPlot.h
     ${barchart_mod_includedir}/vectordisplayform.h
     ${barchart_mod_includedir}/VectorDisplayPlot.h
+    qcustomplot/qcustomplot.h
 )
 include_directories(${barchart_mod_includedir})
 QT4_WRAP_CPP(barchart_moc_sources ${barchart_moc_hdrs})
@@ -59,8 +59,8 @@ QT4_WRAP_CPP(barchart_moc_sources ${barchart_moc_hdrs})
 list(APPEND barchart_sources
     ${barchart_moc_sources}
     ${barchart_ui_hdrs}
+    qcustomplot/qcustomplot.cpp
     displayform.cc
-    DisplayPlot.cc
     VectorDisplayPlot.cc
     vectordisplayform.cc
     vector_sink_f_impl.cc

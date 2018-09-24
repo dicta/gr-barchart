@@ -27,6 +27,7 @@
 #include <QMessageBox>
 
 #include "barchart/DataUpdateEvent.h"
+#include "qcustomplot/qcustomplot.h"
 
 namespace gr {
 namespace barchart {
@@ -48,15 +49,6 @@ VectorDisplayForm::VectorDisplayForm(int nplots, QWidget* parent)
   d_ref_level = 0.0;
   d_clicked = false;
   d_clicked_x_level = 0;
-
-  d_clearmax_act = new QAction("Clear Max", this);
-  d_menu->addAction(d_clearmax_act);
-  connect(d_clearmax_act, SIGNAL(triggered()),
-	  this, SLOT(clearMaxHold()));
-  d_clearmin_act = new QAction("Clear Min", this);
-  d_menu->addAction(d_clearmin_act);
-  connect(d_clearmin_act, SIGNAL(triggered()),
-	  this, SLOT(clearMinHold()));
 
   Reset();
 
@@ -176,18 +168,6 @@ VectorDisplayForm::autoScale(bool en)
   d_autoscale_act->setChecked(en);
   getPlot()->setAutoScale(d_autoscale_state);
   getPlot()->replot();
-}
-
-void
-VectorDisplayForm::clearMaxHold()
-{
-  getPlot()->clearMaxData();
-}
-
-void
-VectorDisplayForm::clearMinHold()
-{
-  getPlot()->clearMinData();
 }
 
 void

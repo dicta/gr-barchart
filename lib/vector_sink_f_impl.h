@@ -33,7 +33,7 @@
 namespace gr {
   namespace barchart {
 
-    class QTGUI_API vector_sink_f_impl : public vector_sink_f
+    class BARCHART_API vector_sink_f_impl : public vector_sink_f
     {
     private:
       void initialize(
@@ -113,7 +113,6 @@ namespace gr {
       void set_line_color(int which, const std::string &color);
       void set_line_width(int which, int width);
       void set_line_style(int which, int style);
-      void set_line_marker(int which, int marker);
       void set_line_alpha(int which, double alpha);
 
       std::string title();
@@ -121,7 +120,6 @@ namespace gr {
       std::string line_color(int which);
       int line_width(int which);
       int line_style(int which);
-      int line_marker(int which);
       double line_alpha(int which);
 
       void set_size(int width, int height);
@@ -129,8 +127,6 @@ namespace gr {
       void enable_menu(bool en);
       void enable_grid(bool en);
       void enable_autoscale(bool en);
-      void clear_max_hold();
-      void clear_min_hold();
       void reset();
 
       int work(int noutput_items,

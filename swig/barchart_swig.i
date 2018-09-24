@@ -8,7 +8,8 @@
 %include "barchart_swig_doc.i"
 
 %{
-#include "barchart/DisplayPlot.h"
+#include "../lib/qcustomplot/qcustomplot.h" // #FIXME
+#include "barchart/VectorDisplayPlot.h"
 #include "barchart/displayform.h"
 #include "barchart/vector_sink_f.h"
 %}

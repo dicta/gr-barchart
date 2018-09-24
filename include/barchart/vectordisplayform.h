@@ -70,8 +70,6 @@ public slots:
   void setYMax(const QString &m);
   void setYMin(const QString &m);
   void autoScale(bool en);
-  void clearMaxHold();
-  void clearMinHold();
 
 private slots:
   void newData(const QEvent *updateEvent);
@@ -88,8 +86,6 @@ private:
   // TODO do I keep these?
   bool d_clicked;
   double d_clicked_x_level;
-
-  QAction *d_clearmin_act, *d_clearmax_act;
 };
 
 

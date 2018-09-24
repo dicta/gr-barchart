@@ -1,8 +1,8 @@
 /* -*- c++ -*- */
 /*
- * Copyright 2014 Free Software Foundation, Inc.
+ * Copyright 2018 Free Software Foundation, Inc.
  *
- * This file is part of GNU Radio
+ * This file is part of gr-barchart
  *
  * GNU Radio is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,77 +25,17 @@
 
 #include "barchart/VectorDisplayPlot.h"
 
-#include <gnuradio/qtgui/qtgui_types.h>
-#include <qwt_scale_draw.h>
-#include <qwt_legend.h>
 #include <QColor>
 #include <iostream>
 
-#if QWT_VERSION < 0x060100
-#include <qwt_legend_item.h>
-#else /* QWT_VERSION < 0x060100 */
-#include <qwt_legend_data.h>
-#include <qwt_legend_label.h>
-#endif /* QWT_VERSION < 0x060100 */
-
-/***********************************************************************
- * Widget to provide mouse pointer coordinate text
- **********************************************************************/
-class VectorDisplayZoomer: public QwtPlotZoomer
-{
-public:
-#if QWT_VERSION < 0x060100
-  VectorDisplayZoomer(QwtPlotCanvas* canvas)
-#else /* QWT_VERSION < 0x060100 */
-  VectorDisplayZoomer(QWidget* canvas)
-#endif /* QWT_VERSION < 0x060100 */
-    : QwtPlotZoomer(canvas),
-    d_x_units(" "),
-    d_y_units(" ")
-  {
-    setTrackerMode(QwtPicker::AlwaysOn);
-  }
-
-  virtual void updateTrackerText()
-  {
-    updateDisplay();
-  }
-
-  void setXUnits(const QString &units)
-  {
-    d_x_units = units;
-  }
-
-  void setYUnits(const QString &units)
-  {
-    d_y_units = units;
-  }
-
-protected:
-  using QwtPlotZoomer::trackerText;
-  virtual QwtText trackerText(QPoint const &p) const
-  {
-    QwtDoublePoint dp = QwtPlotZoomer::invTransform(p);
-    QwtText t(QString("%1 %2, %3 %4")
-              .arg(dp.x(), 0, 'f', 2)
-              .arg(d_x_units)
-              .arg(dp.y(), 0, 'f', 2)
-              .arg(d_y_units)
-    );
-    return t;
-  }
-
-private:
-  QString d_x_units; //!< Units on x-Axis (e.g. Hz)
-  QString d_y_units; //!< Units on y-Axis (e.g. V)
-};
-
+#include "qcustomplot/qcustomplot.h"
 
 /***********************************************************************
  * Main frequency display plotter widget
  **********************************************************************/
 VectorDisplayPlot::VectorDisplayPlot(int nplots, QWidget* parent)
-  : gr::barchart::DisplayPlot(nplots, parent),
+  : QCustomPlot(parent),
+    d_nplots(nplots),
     d_x_axis_label("x"),
     d_y_axis_label("y")
 {
@@ -105,20 +45,43 @@ VectorDisplayPlot::VectorDisplayPlot(int nplots, QWidget* parent)
   d_ymin = -10;
   d_ymax = 10;
 
-  d_min_vec_data.resize(d_numPoints);
-  d_max_vec_data.resize(d_numPoints);
+  QFont axisFont = font();
+  axisFont.setBold(true);
+  axisFont.setPointSize(12);
+
+  QFont tickFont = font();
+  tickFont.setBold(false);
+  tickFont.setPointSize(11);
+
+  QFont titleFont = font();
+  titleFont.setBold(true);
+  titleFont.setPointSize(18);
+
   d_xdata.resize(d_numPoints);
-
   std::fill(d_xdata.begin(), d_xdata.end(), 0x0);
-  std::fill(d_min_vec_data.begin(), d_min_vec_data.end(), 1e6);
-  std::fill(d_max_vec_data.begin(), d_max_vec_data.end(), -1e6);
 
-  setAxisTitle(QwtPlot::xBottom, d_x_axis_label);
-  setAxisScale(QwtPlot::xBottom, d_x_axis_start, d_numPoints-1);
+  // Add all of our graphs
+  for (int i = 0; i < nplots; i++)
+  {
+    addGraph();
+  }
 
-  setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine);
-  setAxisScale(QwtPlot::yLeft, d_ymin, d_ymax);
-  setAxisTitle(QwtPlot::yLeft, d_y_axis_label);
+  this->xAxis->setLabel(d_x_axis_label);
+  this->xAxis->setLabelFont(axisFont);
+  this->xAxis->setTickLabelFont(tickFont);
+
+  this->yAxis->setLabel(d_y_axis_label);
+  this->yAxis->setLabelFont(axisFont);
+  this->yAxis->setTickLabelFont(tickFont);
+
+  this->xAxis->setRange(d_x_axis_start, d_x_axis_start + d_numPoints * d_x_axis_step);
+  this->yAxis->setRange(d_ymin, d_ymax);
+
+  // add title layout element, initially empty
+  d_graph_title = new QCPTextElement(this, "", titleFont);
+  plotLayout()->insertRow(0);
+  plotLayout()->addElement(0, 0, d_graph_title);
+
 
   QList<QColor> default_colors;
   default_colors << QColor(Qt::blue) << QColor(Qt::red) << QColor(Qt::green)
@@ -133,6 +96,7 @@ VectorDisplayPlot::VectorDisplayPlot(int nplots, QWidget* parent)
   for(int i = 0; i < d_nplots; i++) {
     d_ydata[i].resize(d_numPoints, 0x0);
 
+#if 0
     d_plot_curve.push_back(new QwtPlotCurve(QString("Data %1").arg(i)));
     d_plot_curve[i]->attach(this);
 
@@ -147,92 +111,28 @@ VectorDisplayPlot::VectorDisplayPlot(int nplots, QWidget* parent)
     d_plot_curve[i]->setSymbol(symbol);
 #endif
     setLineColor(i, default_colors[i]);
+#endif
   }
-
-  // Create min/max plotter curves
-  d_min_vec_plot_curve = new QwtPlotCurve("Min Hold");
-  d_min_vec_plot_curve->attach(this);
-  const QColor default_min_fft_color = Qt::magenta;
-  setMinVecColor(default_min_fft_color);
-#if QWT_VERSION < 0x060000
-  d_min_vec_plot_curve->setRawData(d_xdata.data(), d_min_vec_data.data(), d_numPoints);
-#else
-  d_min_vec_plot_curve->setRawSamples(d_xdata.data(), d_min_vec_data.data(), d_numPoints);
-#endif
-  d_min_vec_plot_curve->setVisible(false);
-  d_min_vec_plot_curve->setZ(0);
-
-  d_max_vec_plot_curve = new QwtPlotCurve("Max Hold");
-  d_max_vec_plot_curve->attach(this);
-  QColor default_max_fft_color = Qt::darkYellow;
-  setMaxVecColor(default_max_fft_color);
-#if QWT_VERSION < 0x060000
-  d_max_vec_plot_curve->setRawData(d_xdata.data(), d_max_vec_data.data(), d_numPoints);
-#else
-  d_max_vec_plot_curve->setRawSamples(d_xdata.data() d_max_vec_data.data(), d_numPoints);
-#endif
-  d_max_vec_plot_curve->setVisible(false);
-  d_max_vec_plot_curve->setZ(0);
-
-  d_lower_intensity_marker= new QwtPlotMarker();
-  d_lower_intensity_marker->setLineStyle(QwtPlotMarker::HLine);
-  QColor default_marker_lower_intensity_color = Qt::cyan;
-  setMarkerLowerIntensityColor(default_marker_lower_intensity_color);
-  d_lower_intensity_marker->attach(this);
-
-  d_upper_intensity_marker = new QwtPlotMarker();
-  d_upper_intensity_marker->setLineStyle(QwtPlotMarker::HLine);
-  QColor default_marker_upper_intensity_color = Qt::green;
-  setMarkerUpperIntensityColor(default_marker_upper_intensity_color);
-  d_upper_intensity_marker->attach(this);
-
-  d_marker_ref_level = new QwtPlotMarker();
-  d_marker_ref_level->setLineStyle(QwtPlotMarker::HLine);
-  QColor d_default_marker_ref_level_color = Qt::darkRed;
-  setMarkerRefLevelAmplitudeColor(d_default_marker_ref_level_color);
-  d_marker_ref_level->attach(this);
 
   d_ref_level = -HUGE_VAL;
 
-  d_zoomer = new VectorDisplayZoomer(canvas());
-
-#if QWT_VERSION < 0x060000
-  d_zoomer->setSelectionFlags(QwtPicker::RectSelection | QwtPicker::DragSelection);
-#endif
-
-  d_zoomer->setMousePattern(QwtEventPattern::MouseSelect2,
-                            Qt::RightButton, Qt::ControlModifier);
-  d_zoomer->setMousePattern(QwtEventPattern::MouseSelect3,
-                            Qt::RightButton);
-
-
-  const QColor default_zoomer_color(Qt::darkRed);
-  setZoomerColor(default_zoomer_color);
-
-  // Do this after the zoomer has been built
   _resetXAxisPoints();
-
-  // Turn off min/max hold plots in legend
-#if QWT_VERSION < 0x060100
-  QWidget *w;
-  QwtLegend* legendDisplay = legend();
-  w = legendDisplay->find(d_min_vec_plot_curve);
-  ((QwtLegendItem*)w)->setChecked(true);
-  w = legendDisplay->find(d_max_vec_plot_curve);
-  ((QwtLegendItem*)w)->setChecked(true);
-#else /* QWT_VERSION < 0x060100 */
-  QWidget *w;
-  w = ((QwtLegend*)legend())->legendWidget(itemToInfo(d_min_vec_plot_curve));
-  ((QwtLegendLabel*)w)->setChecked(true);
-  w = ((QwtLegend*)legend())->legendWidget(itemToInfo(d_max_vec_plot_curve));
-  ((QwtLegendLabel*)w)->setChecked(true);
-#endif /* QWT_VERSION < 0x060100 */
 
   replot();
 }
 
 VectorDisplayPlot::~VectorDisplayPlot()
 {}
+
+QString VectorDisplayPlot::getTitle() const
+{
+    return d_graph_title->text();
+}
+
+void VectorDisplayPlot::setTitle(const QString title)
+{
+    d_graph_title->setText(title);
+}
 
 void
 VectorDisplayPlot::setYaxis(double min, double max)
@@ -242,12 +142,7 @@ VectorDisplayPlot::setYaxis(double min, double max)
   d_ymax = max;
 
   // Set the axis max/min to the new values
-  setAxisScale(QwtPlot::yLeft, d_ymin, d_ymax);
-
-  // Reset the base zoom level to the new axis scale set here.
-  // But don't do it if we set the axis due to auto scaling.
-  if(!d_autoscale_state)
-    d_zoomer->setZoomBase();
+  this->yAxis->setRange(d_ymin, d_ymax);
 }
 
 double
@@ -265,23 +160,44 @@ VectorDisplayPlot::getYMax() const
 void VectorDisplayPlot::setXAxisLabel(const QString &label)
 {
   d_x_axis_label = label;
-  setAxisTitle(QwtPlot::xBottom, label);
+  this->xAxis->setLabel(label);
 }
 
 void VectorDisplayPlot::setYAxisLabel(const QString &label)
 {
   d_y_axis_label = label;
-  setAxisTitle(QwtPlot::yLeft, label);
+  this->yAxis->setLabel(label);
 }
 
 void VectorDisplayPlot::setXAxisUnit(const QString &unit)
 {
-  ((VectorDisplayZoomer*)d_zoomer)->setXUnits(unit);
+  if (!unit.isEmpty())
+  {
+    this->xAxis->setLabel(QString("%1 (%2)").arg(d_x_axis_label).arg(unit));
+  }
+  else
+  {
+    this->xAxis->setLabel(d_x_axis_label);
+  }
 }
 
 void VectorDisplayPlot::setYAxisUnit(const QString &unit)
 {
-  ((VectorDisplayZoomer*)d_zoomer)->setYUnits(unit);
+  if (!unit.isEmpty())
+  {
+    this->yAxis->setLabel(QString("%1 (%2)").arg(d_y_axis_label).arg(unit));
+  }
+  else
+  {
+    this->yAxis->setLabel(d_y_axis_label);
+  }
+}
+
+// Change the display region of the x-axis (zoom) without changing
+// the actual values that data is plotted at.
+void VectorDisplayPlot::setXaxis(double min, double max)
+{
+    this->xAxis->setRange(min, max);
 }
 
 void
@@ -296,21 +212,9 @@ VectorDisplayPlot::setXAxisValues(
   d_x_axis_start = start;
   d_x_axis_step = step;
 
-  if((axisScaleDraw(QwtPlot::xBottom) != NULL) && (d_zoomer != NULL)) {
-    setAxisTitle(QwtPlot::xBottom, d_x_axis_label);
-    if(reset) {
-      _resetXAxisPoints();
-      clearMaxData();
-      clearMinData();
-    }
+  if(reset) {
+    _resetXAxisPoints();
   }
-}
-
-void
-VectorDisplayPlot::replot()
-{
-  d_marker_ref_level->setYValue(d_ref_level);
-  QwtPlot::replot();
 }
 
 void
@@ -322,43 +226,13 @@ VectorDisplayPlot::plotNewData(
 ) {
   if(!d_stop) {
     if(numDataPoints > 0) {
-      if(numDataPoints != d_numPoints) {
-        d_numPoints = numDataPoints;
 
-        d_xdata.resize(d_numPoints);
-        d_min_vec_data.resize(d_numPoints);
-        d_max_vec_data.resize(d_numPoints);
-
-        for(int i = 0; i < d_nplots; i++) {
-          d_ydata[i].resize(d_numPoints);
-
-#if QWT_VERSION < 0x060000
-          d_plot_curve[i]->setRawData(d_xdata.data(), d_ydata[i].data(), d_numPoints);
-#else
-          d_plot_curve[i]->setRawSamples(d_xdata.data(), d_ydata[i].data(), d_numPoints);
-#endif
-        }
-
-#if QWT_VERSION < 0x060000
-        d_min_vec_plot_curve->setRawData(d_xdata.data(), d_min_vec_data.data(), d_numPoints);
-        d_max_vec_plot_curve->setRawData(d_xdata.data(), d_max_vec_data.data(), d_numPoints);
-#else
-        d_min_vec_plot_curve->setRawSamples(d_xdata.data(), d_min_vec_data.data(), d_numPoints);
-        d_max_vec_plot_curve->setRawSamples(d_xdata.data(), d_max_vec_data.data(), d_numPoints);
-#endif
-        _resetXAxisPoints();
-        clearMaxData();
-        clearMinData();
-      }
+// FIXME IMPLEMENT
+      _resetXAxisPoints();
 
       double bottom=1e20, top=-1e20;
       for(int n = 0; n < d_nplots; n++) {
-        std::copy(dataPoints[n].begin(), dataPoints[n].end(), d_ydata[n].begin());
-
         for(int64_t point = 0; point < numDataPoints; point++) {
-            d_min_vec_data[point] = std::min(d_min_vec_data[point], dataPoints[n][point]);
-            d_max_vec_data[point] = std::max(d_max_vec_data[point], dataPoints[n][point]);
-
             // Find overall top and bottom values in plot.
             // Used for autoscaling y-axis.
             bottom = std::min(bottom, dataPoints[n][point]);
@@ -373,22 +247,6 @@ VectorDisplayPlot::plotNewData(
 
       replot();
     }
-  }
-}
-
-void
-VectorDisplayPlot::clearMaxData()
-{
-  for(int64_t number = 0; number < d_numPoints; number++) {
-    d_max_vec_data[number] = d_ymin;
-  }
-}
-
-void
-VectorDisplayPlot::clearMinData()
-{
-  for(int64_t number = 0; number < d_numPoints; number++) {
-    d_min_vec_data[number] = d_ymax;
   }
 }
 
@@ -408,200 +266,135 @@ VectorDisplayPlot::setAutoScale(bool state)
 }
 
 void
-VectorDisplayPlot::setMaxVecVisible(const bool visibleFlag)
-{
-  d_max_vec_visible = visibleFlag;
-  d_max_vec_plot_curve->setVisible(visibleFlag);
-}
-
-const bool
-VectorDisplayPlot::getMaxVecVisible() const
-{
-  return d_max_vec_visible;
-}
-
-void
-VectorDisplayPlot::setMinVecVisible(const bool visibleFlag)
-{
-  d_min_vec_visible = visibleFlag;
-  d_min_vec_plot_curve->setVisible(visibleFlag);
-}
-
-const bool
-VectorDisplayPlot::getMinVecVisible() const
-{
-  return d_min_vec_visible;
-}
-
-void
 VectorDisplayPlot::_resetXAxisPoints()
 {
   for(int64_t loc = 0; loc < d_numPoints; loc++) {
     d_xdata[loc] = d_x_axis_start + loc * d_x_axis_step;
   }
 
-  setAxisScale(QwtPlot::xBottom, d_xdata[0], d_xdata[d_numPoints-1]);
-
-  // Set up zoomer base for maximum unzoom x-axis
-  // and reset to maximum unzoom level
-  QwtDoubleRect zbase = d_zoomer->zoomBase();
-  d_zoomer->zoom(zbase);
-  d_zoomer->setZoomBase(zbase);
-  d_zoomer->setZoomBase(true);
-  d_zoomer->zoom(0);
-}
-
-void
-VectorDisplayPlot::setLowerIntensityLevel(const double lowerIntensityLevel)
-{
-  d_lower_intensity_marker->setYValue(lowerIntensityLevel);
-}
-
-void
-VectorDisplayPlot::setUpperIntensityLevel(const double upperIntensityLevel)
-{
-  d_upper_intensity_marker->setYValue(upperIntensityLevel);
+  this->xAxis->setRange(d_xdata[0], d_xdata[d_numPoints-1]);
 }
 
 void
 VectorDisplayPlot::setTraceColour(QColor c)
 {
-  d_plot_curve[0]->setPen(QPen(c));
+  graph(0)->setPen(QPen(c));
 }
 
 void
 VectorDisplayPlot::setBGColour(QColor c)
 {
   QPalette palette;
-  palette.setColor(canvas()->backgroundRole(), c);
-  canvas()->setPalette(palette);
+  palette.setColor(backgroundRole(), c);
+  setPalette(palette);
 }
 
 void
-VectorDisplayPlot::onPickerPointSelected(const QwtDoublePoint & p)
+VectorDisplayPlot::setStop(bool on)
 {
-  QPointF point = p;
-  point.setX(point.x());
-  emit plotPointSelected(point);
+  d_stop = on;
 }
 
 void
-VectorDisplayPlot::onPickerPointSelected6(const QPointF & p)
+VectorDisplayPlot::setLineLabel(int which, QString label)
 {
-  QPointF point = p;
-  point.setX(point.x());
-  emit plotPointSelected(point);
+  if (which < d_nplots) {
+    graph(which)->setName(label);
+  }
+}
+
+QString
+VectorDisplayPlot::getLineLabel(int which)
+{
+  return (which < d_nplots) ? graph(which)->name() : QString();
 }
 
 void
-VectorDisplayPlot::setMinVecColor (QColor c)
+VectorDisplayPlot::setLineColor(int which, QColor color)
 {
-  d_min_vec_color = c;
-  d_min_vec_plot_curve->setPen(QPen(c));
+  if (which < d_nplots) {
+    // Set the color of the pen
+    QPen pen(graph(which)->pen());
+    pen.setColor(color);
+    graph(which)->setPen(pen);
+  }
 }
 
-const QColor
-VectorDisplayPlot::getMinVecColor() const
+QColor
+VectorDisplayPlot::getLineColor(int which) const
 {
-  return d_min_vec_color;
+  // If that plot doesn't exist then return black.
+  return (which < d_nplots) ? graph(which)->pen().color() : QColor("black");
+}
+
+
+void
+VectorDisplayPlot::setLineWidth(int which, int width)
+{
+  if(which < d_nplots) {
+    // Set the new line width
+    QPen pen(graph(which)->pen());
+    pen.setWidth(width);
+    graph(which)->setPen(pen);
+  }
+}
+
+int
+VectorDisplayPlot::getLineWidth(int which) const
+{
+  return (which < d_nplots) ? graph(which)->pen().width() : 0;
 }
 
 void
-VectorDisplayPlot::setMaxVecColor (QColor c)
+VectorDisplayPlot::setLineStyle(int which, Qt::PenStyle style)
 {
-  d_max_vec_color = c;
-  d_max_vec_plot_curve->setPen(QPen(c));
+  if(which < d_nplots) {
+    QPen pen(graph(which)->pen());
+    pen.setStyle(style);
+    graph(which)->setPen(pen);
+  }
 }
 
-const QColor
-VectorDisplayPlot::getMaxVecColor() const
+const Qt::PenStyle
+VectorDisplayPlot::getLineStyle(int which) const
 {
-  return d_max_vec_color;
-}
-
-void
-VectorDisplayPlot::setMarkerLowerIntensityColor (QColor c)
-{
-  d_marker_lower_intensity_color = c;
-  d_lower_intensity_marker->setLinePen(QPen(c));
-}
-const QColor
-VectorDisplayPlot::getMarkerLowerIntensityColor () const
-{
-  return d_marker_lower_intensity_color;
+  return (which < d_nplots) ? graph(which)->pen().style() : Qt::SolidLine;
 }
 
 void
-VectorDisplayPlot::setMarkerLowerIntensityVisible (bool visible)
+VectorDisplayPlot::setMarkerAlpha(int which, int alpha)
 {
-  d_marker_lower_intensity_visible = visible;
-  if(visible)
-    d_lower_intensity_marker->setLineStyle(QwtPlotMarker::HLine);
-  else
-    d_lower_intensity_marker->setLineStyle(QwtPlotMarker::NoLine);
+  if (which < d_nplots) {
+    // Get the pen color
+    QPen pen(graph(which)->pen());
+    QColor color = pen.color();
+
+    // Set new alpha and update pen
+    color.setAlpha(alpha);
+    pen.setColor(color);
+    graph(which)->setPen(pen);
+  }
 }
-const bool
-VectorDisplayPlot::getMarkerLowerIntensityVisible() const
+
+int
+VectorDisplayPlot::getMarkerAlpha(int which) const
 {
-  return d_marker_lower_intensity_visible;
+  // If that plot doesn't exist then return transparent.
+  return (which < d_nplots) ? graph(which)->pen().color().alpha() : 0;
 }
 
 void
-VectorDisplayPlot::setMarkerUpperIntensityColor(QColor c)
+VectorDisplayPlot::disableLegend()
 {
-  d_marker_upper_intensity_color = c;
-  d_upper_intensity_marker->setLinePen(QPen(c, 0, Qt::DotLine));
-}
-
-const QColor
-VectorDisplayPlot::getMarkerUpperIntensityColor() const
-{
-  return d_marker_upper_intensity_color;
+  this->legend->setVisible(false);
 }
 
 void
-VectorDisplayPlot::setMarkerUpperIntensityVisible(bool visible)
+VectorDisplayPlot::setAxisLabels(bool on)
 {
-  d_marker_upper_intensity_visible = visible;
-  if(visible)
-    d_upper_intensity_marker->setLineStyle(QwtPlotMarker::HLine);
-  else
-    d_upper_intensity_marker->setLineStyle(QwtPlotMarker::NoLine);
+  this->xAxis->setVisible(on);
+  this->yAxis->setVisible(on);
 }
 
-const bool
-VectorDisplayPlot::getMarkerUpperIntensityVisible() const
-{
-  return d_marker_upper_intensity_visible;
-}
-
-void
-VectorDisplayPlot::setMarkerRefLevelAmplitudeColor(QColor c)
-{
-  d_marker_ref_level_color = c;
-  d_marker_ref_level->setLinePen(QPen(c, 0, Qt::DotLine));
-}
-
-const QColor
-VectorDisplayPlot::getMarkerRefLevelAmplitudeColor() const
-{
-  return d_marker_ref_level_color;
-}
-
-void
-VectorDisplayPlot::setMarkerRefLevelAmplitudeVisible(bool visible)
-{
-  d_marker_ref_level_visible = visible;
-  if(visible)
-    d_marker_ref_level->setLineStyle(QwtPlotMarker::HLine);
-  else
-    d_marker_ref_level->setLineStyle(QwtPlotMarker::NoLine);
-}
-
-const bool
-VectorDisplayPlot::getMarkerRefLevelAmplitudeVisible() const
-{
-  return d_marker_ref_level_visible;
-}
 
 #endif /* VECTOR_DISPLAY_PLOT */
