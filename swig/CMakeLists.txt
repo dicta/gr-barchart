@@ -37,6 +37,16 @@ endif()
 include(GrSwig)
 include(GrPython)
 
+add_definitions(-DENABLE_PYTHON)
+list(APPEND GR_SWIG_FLAGS "-DENABLE_PYTHON")
+
+set(GR_SWIG_INCLUDE_DIRS
+    ${QWT_INCLUDE_DIRS}
+    ${QT_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIRS}
+)
+
+
 ########################################################################
 # Setup swig generation
 ########################################################################

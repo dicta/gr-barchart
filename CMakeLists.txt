@@ -163,6 +163,11 @@ find_package(PythonLibs 2)
 include(GrPython)
 GR_PYTHON_CHECK_MODULE("PyQt4" PyQt4 True PYQT4_FOUND)
 
+if(PYTHONINTERP_FOUND)
+    add_definitions(-DENABLE_PYTHON=1)
+    include_directories(${PYTHON_INCLUDE_DIR})
+endif()
+
 # populate the environment with QT variables
 include(GrSetupQt4)
 
