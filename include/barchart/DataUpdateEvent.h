@@ -63,7 +63,7 @@ public:
 
     uint64_t getNumDataPoints() const
     {
-        return _dataPoints.size();
+        return _dataPoints.empty() ? 0 : _dataPoints.at(0).size();
     }
 
     bool getRepeatDataFlag() const;

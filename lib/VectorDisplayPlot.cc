@@ -109,6 +109,10 @@ VectorDisplayPlot::VectorDisplayPlot(int nplots, QWidget* parent)
   d_max_vec_data.resize(d_numPoints);
   d_xdata.resize(d_numPoints);
 
+  std::fill(d_xdata.begin(), d_xdata.end(), 0x0);
+  std::fill(d_min_vec_data.begin(), d_min_vec_data.end(), 1e6);
+  std::fill(d_max_vec_data.begin(), d_max_vec_data.end(), -1e6);
+
   setAxisTitle(QwtPlot::xBottom, d_x_axis_label);
   setAxisScale(QwtPlot::xBottom, d_x_axis_start, d_numPoints-1);
 
@@ -181,10 +185,6 @@ VectorDisplayPlot::VectorDisplayPlot(int nplots, QWidget* parent)
   QColor default_marker_upper_intensity_color = Qt::green;
   setMarkerUpperIntensityColor(default_marker_upper_intensity_color);
   d_upper_intensity_marker->attach(this);
-
-  std::fill(d_xdata.begin(), d_xdata.end(), 0x0);
-  std::fill(d_min_vec_data.begin(), d_min_vec_data.end(), 1e6);
-  std::fill(d_max_vec_data.begin(), d_max_vec_data.end(), -1e6);
 
   d_marker_ref_level = new QwtPlotMarker();
   d_marker_ref_level->setLineStyle(QwtPlotMarker::HLine);
@@ -338,6 +338,7 @@ VectorDisplayPlot::plotNewData(
           d_plot_curve[i]->setRawSamples(d_xdata.data(), d_ydata[i].data(), d_numPoints);
 #endif
         }
+
 #if QWT_VERSION < 0x060000
         d_min_vec_plot_curve->setRawData(d_xdata.data(), d_min_vec_data.data(), d_numPoints);
         d_max_vec_plot_curve->setRawData(d_xdata.data(), d_max_vec_data.data(), d_numPoints);
@@ -352,7 +353,7 @@ VectorDisplayPlot::plotNewData(
 
       double bottom=1e20, top=-1e20;
       for(int n = 0; n < d_nplots; n++) {
-        d_ydata[n] = dataPoints[n];
+        std::copy(dataPoints[n].begin(), dataPoints[n].end(), d_ydata[n].begin());
 
         for(int64_t point = 0; point < numDataPoints; point++) {
             d_min_vec_data[point] = std::min(d_min_vec_data[point], dataPoints[n][point]);
@@ -435,10 +436,8 @@ VectorDisplayPlot::getMinVecVisible() const
 void
 VectorDisplayPlot::_resetXAxisPoints()
 {
-  double xValue = d_x_axis_start;
   for(int64_t loc = 0; loc < d_numPoints; loc++) {
-    d_xdata[loc] = xValue;
-    xValue += d_x_axis_step;
+    d_xdata[loc] = d_x_axis_start + loc * d_x_axis_step;
   }
 
   setAxisScale(QwtPlot::xBottom, d_xdata[0], d_xdata[d_numPoints-1]);
