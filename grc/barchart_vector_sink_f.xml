@@ -42,8 +42,8 @@ for i in xrange($nconnections):
     else:
         self.$(id).set_line_label(i, labels[i])
     self.$(id).set_line_width(i, widths[i])
-    self.$(id).set_line_color(i, colors[i])
     self.$(id).set_line_alpha(i, alphas[i])
+    self.$(id).set_fill_color(i, colors[i])
 
 self._$(id)_win = sip.wrapinstance(self.$(id).pyqwidget(), Qt.QWidget)
 $(gui_hint() % $win)</make>
@@ -163,30 +163,6 @@ $(gui_hint() % $win)</make>
   </param>
 
   <param>
-    <name>Average</name>
-    <key>average</key>
-    <value>False</value>
-    <type>enum</type>
-    <hide>part</hide>
-    <option>
-      <name>None</name>
-      <key>1.0</key>
-    </option>
-    <option>
-      <name>Low</name>
-      <key>0.2</key>
-    </option>
-    <option>
-      <name>Medium</name>
-      <key>0.1</key>
-    </option>
-    <option>
-      <name>High</name>
-      <key>0.05</key>
-    </option>
-  </param>
-
-  <param>
     <name>Y min</name>
     <key>ymin</key>
     <value>-140</value>
@@ -239,7 +215,7 @@ $(gui_hint() % $win)</make>
   </param>
 
   <param>
-    <name>Line 1 Label</name>
+    <name>Series 1 Label</name>
     <key>label1</key>
     <type>string</type>
     <hide>#if int($nconnections()) >= 1 then 'part' else 'all'#</hide>
@@ -247,7 +223,7 @@ $(gui_hint() % $win)</make>
   </param>
 
   <param>
-    <name>Line 1 Width</name>
+    <name>Series 1 Line Width</name>
     <key>width1</key>
     <value>1</value>
     <type>int</type>
@@ -256,7 +232,7 @@ $(gui_hint() % $win)</make>
   </param>
 
   <param>
-    <name>Line 1 Color</name>
+    <name>Series 1 Fill Color</name>
     <key>color1</key>
     <type>enum</type>
     <hide>#if int($nconnections()) >= 1 then 'part' else 'all'#</hide>
@@ -304,7 +280,7 @@ $(gui_hint() % $win)</make>
   </param>
 
   <param>
-    <name>Line 1 Alpha</name>
+    <name>Series 1 Fill Alpha</name>
     <key>alpha1</key>
     <value>1.0</value>
     <type>float</type>
@@ -315,21 +291,21 @@ $(gui_hint() % $win)</make>
 
   <param>
     <base_key>label1</base_key>
-    <name>Line 2 Label</name>
+    <name>Series 2 Label</name>
     <key>label2</key>
     <hide>#if int($nconnections()) >= 2 then 'part' else 'all'#</hide>
   </param>
 
   <param>
     <base_key>width1</base_key>
-    <name>Line 2 Width</name>
+    <name>Series 2 Line Width</name>
     <key>width2</key>
     <hide>#if int($nconnections()) >= 2 then 'part' else 'all'#</hide>
   </param>
 
   <param>
     <base_key>color1</base_key>
-    <name>Line 2 Color</name>
+    <name>Series 2 Fill Color</name>
     <key>color2</key>
     <value>"red"</value>
     <hide>#if int($nconnections()) >= 2 then 'part' else 'all'#</hide>
@@ -337,7 +313,7 @@ $(gui_hint() % $win)</make>
 
   <param>
     <base_key>alpha1</base_key>
-    <name>Line 2 Alpha</name>
+    <name>Series 2 Fill Alpha</name>
     <key>alpha2</key>
     <hide>#if int($nconnections()) >= 2 then 'part' else 'all'#</hide>
   </param>
@@ -345,21 +321,21 @@ $(gui_hint() % $win)</make>
 
   <param>
     <base_key>label1</base_key>
-    <name>Line 3 Label</name>
+    <name>Series 3 Label</name>
     <key>label3</key>
     <hide>#if int($nconnections()) >= 3 then 'part' else 'all'#</hide>
   </param>
 
   <param>
     <base_key>width1</base_key>
-    <name>Line 3 Width</name>
+    <name>Series 3 Line Width</name>
     <key>width3</key>
     <hide>#if int($nconnections()) >= 3 then 'part' else 'all'#</hide>
   </param>
 
   <param>
     <base_key>color1</base_key>
-    <name>Line 3 Color</name>
+    <name>Series 3 Fill Color</name>
     <key>color3</key>
     <value>"green"</value>
     <hide>#if int($nconnections()) >= 3 then 'part' else 'all'#</hide>
@@ -367,7 +343,7 @@ $(gui_hint() % $win)</make>
 
   <param>
     <base_key>alpha1</base_key>
-    <name>Line 3 Alpha</name>
+    <name>Series 3 Fill Alpha</name>
     <key>alpha3</key>
     <hide>#if int($nconnections()) >= 3 then 'part' else 'all'#</hide>
   </param>
@@ -375,21 +351,21 @@ $(gui_hint() % $win)</make>
 
   <param>
     <base_key>label1</base_key>
-    <name>Line 4 Label</name>
+    <name>Series 4 Label</name>
     <key>label4</key>
     <hide>#if int($nconnections()) >= 4 then 'part' else 'all'#</hide>
   </param>
 
   <param>
     <base_key>width1</base_key>
-    <name>Line 4 Width</name>
+    <name>Series 4 Line Width</name>
     <key>width4</key>
     <hide>#if int($nconnections()) >= 4 then 'part' else 'all'#</hide>
   </param>
 
   <param>
     <base_key>color1</base_key>
-    <name>Line 4 Color</name>
+    <name>Series 4 Fill Color</name>
     <key>color4</key>
     <value>"black"</value>
     <hide>#if int($nconnections()) >= 4 then 'part' else 'all'#</hide>
@@ -397,7 +373,7 @@ $(gui_hint() % $win)</make>
 
   <param>
     <base_key>alpha1</base_key>
-    <name>Line 4 Alpha</name>
+    <name>Series 4 Fill Alpha</name>
     <key>alpha4</key>
     <hide>#if int($nconnections()) >= 4 then 'part' else 'all'#</hide>
   </param>
@@ -405,21 +381,21 @@ $(gui_hint() % $win)</make>
 
   <param>
     <base_key>label1</base_key>
-    <name>Line 5 Label</name>
+    <name>Series 5 Label</name>
     <key>label5</key>
     <hide>#if int($nconnections()) >= 5 then 'part' else 'all'#</hide>
   </param>
 
   <param>
     <base_key>width1</base_key>
-    <name>Line 5 Width</name>
+    <name>Series 5 Line Width</name>
     <key>width5</key>
     <hide>#if int($nconnections()) >= 5 then 'part' else 'all'#</hide>
   </param>
 
   <param>
     <base_key>color1</base_key>
-    <name>Line 5 Color</name>
+    <name>Series 5 Fill Color</name>
     <key>color5</key>
     <value>"cyan"</value>
     <hide>#if int($nconnections()) >= 5 then 'part' else 'all'#</hide>
@@ -427,7 +403,7 @@ $(gui_hint() % $win)</make>
 
   <param>
     <base_key>alpha1</base_key>
-    <name>Line 5 Alpha</name>
+    <name>Series 5 Fill Alpha</name>
     <key>alpha5</key>
     <hide>#if int($nconnections()) >= 5 then 'part' else 'all'#</hide>
   </param>
@@ -435,21 +411,21 @@ $(gui_hint() % $win)</make>
 
   <param>
     <base_key>label1</base_key>
-    <name>Line 6 Label</name>
+    <name>Series 6 Label</name>
     <key>label6</key>
     <hide>#if int($nconnections()) >= 6 then 'part' else 'all'#</hide>
   </param>
 
   <param>
     <base_key>width1</base_key>
-    <name>Line 6 Width</name>
+    <name>Series 6 Line Width</name>
     <key>width6</key>
     <hide>#if int($nconnections()) >= 6 then 'part' else 'all'#</hide>
   </param>
 
   <param>
     <base_key>color1</base_key>
-    <name>Line 6 Color</name>
+    <name>Series 6 Fill Color</name>
     <key>color6</key>
     <value>"magenta"</value>
     <hide>#if int($nconnections()) >= 6 then 'part' else 'all'#</hide>
@@ -457,7 +433,7 @@ $(gui_hint() % $win)</make>
 
   <param>
     <base_key>alpha1</base_key>
-    <name>Line 6 Alpha</name>
+    <name>Series 6 Fill Alpha</name>
     <key>alpha6</key>
     <hide>#if int($nconnections()) >= 6 then 'part' else 'all'#</hide>
   </param>
@@ -465,21 +441,21 @@ $(gui_hint() % $win)</make>
 
   <param>
     <base_key>label1</base_key>
-    <name>Line 7 Label</name>
+    <name>Series 7 Label</name>
     <key>label7</key>
     <hide>#if int($nconnections()) >= 7 then 'part' else 'all'#</hide>
   </param>
 
   <param>
     <base_key>width1</base_key>
-    <name>Line 7 Width</name>
+    <name>Series 7 Line Width</name>
     <key>width7</key>
     <hide>#if int($nconnections()) >= 7 then 'part' else 'all'#</hide>
   </param>
 
   <param>
     <base_key>color1</base_key>
-    <name>Line 7 Color</name>
+    <name>Series 7 Fill Color</name>
     <key>color7</key>
     <value>"yellow"</value>
     <hide>#if int($nconnections()) >= 7 then 'part' else 'all'#</hide>
@@ -487,7 +463,7 @@ $(gui_hint() % $win)</make>
 
   <param>
     <base_key>alpha1</base_key>
-    <name>Line 7 Alpha</name>
+    <name>Series 7 Fill Alpha</name>
     <key>alpha7</key>
     <hide>#if int($nconnections()) >= 7 then 'part' else 'all'#</hide>
   </param>
@@ -495,21 +471,21 @@ $(gui_hint() % $win)</make>
 
   <param>
     <base_key>label1</base_key>
-    <name>Line 8 Label</name>
+    <name>Series 8 Label</name>
     <key>label8</key>
     <hide>#if int($nconnections()) >= 8 then 'part' else 'all'#</hide>
   </param>
 
   <param>
     <base_key>width1</base_key>
-    <name>Line 8 Width</name>
+    <name>Series 8 Line Width</name>
     <key>width8</key>
     <hide>#if int($nconnections()) >= 8 then 'part' else 'all'#</hide>
   </param>
 
   <param>
     <base_key>color1</base_key>
-    <name>Line 8 Color</name>
+    <name>Series 8 Fill Color</name>
     <key>color8</key>
     <value>"dark red"</value>
     <hide>#if int($nconnections()) >= 8 then 'part' else 'all'#</hide>
@@ -517,7 +493,7 @@ $(gui_hint() % $win)</make>
 
   <param>
     <base_key>alpha1</base_key>
-    <name>Line 8 Alpha</name>
+    <name>Series 8 Fill Alpha</name>
     <key>alpha8</key>
     <hide>#if int($nconnections()) >= 8 then 'part' else 'all'#</hide>
   </param>
@@ -525,21 +501,21 @@ $(gui_hint() % $win)</make>
 
   <param>
     <base_key>label1</base_key>
-    <name>Line 9 Label</name>
+    <name>Series 9 Label</name>
     <key>label9</key>
     <hide>#if int($nconnections()) >= 9 then 'part' else 'all'#</hide>
   </param>
 
   <param>
     <base_key>width1</base_key>
-    <name>Line 9 Width</name>
+    <name>Series 9 Line Width</name>
     <key>width9</key>
     <hide>#if int($nconnections()) >= 9 then 'part' else 'all'#</hide>
   </param>
 
   <param>
     <base_key>color1</base_key>
-    <name>Line 9 Color</name>
+    <name>Series 9 Fill Color</name>
     <key>color9</key>
     <value>"dark green"</value>
     <hide>#if int($nconnections()) >= 9 then 'part' else 'all'#</hide>
@@ -547,7 +523,7 @@ $(gui_hint() % $win)</make>
 
   <param>
     <base_key>alpha1</base_key>
-    <name>Line 9 Alpha</name>
+    <name>Series 9 Fill Alpha</name>
     <key>alpha9</key>
     <hide>#if int($nconnections()) >= 9 then 'part' else 'all'#</hide>
   </param>
@@ -555,21 +531,21 @@ $(gui_hint() % $win)</make>
 
   <param>
     <base_key>label1</base_key>
-    <name>Line 10 Label</name>
+    <name>Series 10 Label</name>
     <key>label10</key>
     <hide>#if int($nconnections()) >= 10 then 'part' else 'all'#</hide>
   </param>
 
   <param>
     <base_key>width1</base_key>
-    <name>Line 10 Width</name>
+    <name>Series 10 Line Width</name>
     <key>width10</key>
     <hide>#if int($nconnections()) >= 10 then 'part' else 'all'#</hide>
   </param>
 
   <param>
     <base_key>color1</base_key>
-    <name>Line 10 Color</name>
+    <name>Series 10 Fill Color</name>
     <key>color10</key>
     <value>"dark blue"</value>
     <hide>#if int($nconnections()) >= 10 then 'part' else 'all'#</hide>
@@ -577,7 +553,7 @@ $(gui_hint() % $win)</make>
 
   <param>
     <base_key>alpha1</base_key>
-    <name>Line 10 Alpha</name>
+    <name>Series 10 Fill Alpha</name>
     <key>alpha10</key>
     <hide>#if int($nconnections()) >= 10 then 'part' else 'all'#</hide>
   </param>

@@ -74,6 +74,8 @@ public slots:
   virtual void setAxisLabels(bool en);
   virtual void setYaxis(double min, double max);
   virtual void setXaxis(double min, double max);
+  virtual void setFillColor(int which, QColor color);
+  virtual QColor getFillColor(int which) const;
   virtual void setLineLabel(int which, QString label);
   virtual QString getLineLabel(int which);
   virtual void setLineColor(int which, QColor color);

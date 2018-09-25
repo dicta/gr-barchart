@@ -259,6 +259,12 @@ namespace gr {
     }
 
     void
+    vector_sink_f_impl::set_fill_color(int which, const std::string &color)
+    {
+      d_main_gui->setFillColor(which, color.c_str());
+    }
+
+    void
     vector_sink_f_impl::set_line_label(int which, const std::string &label)
     {
       d_main_gui->setLineLabel(which, label.c_str());
@@ -298,6 +304,12 @@ namespace gr {
     vector_sink_f_impl::title()
     {
       return d_main_gui->title().toStdString();
+    }
+
+    std::string
+    vector_sink_f_impl::fill_color(int which)
+    {
+      return d_main_gui->fillColor(which).toStdString();
     }
 
     std::string

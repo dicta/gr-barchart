@@ -174,6 +174,14 @@ DisplayForm::setTitle(const QString &title)
 }
 
 void
+DisplayForm::setFillColor(int which, const QString &color)
+{
+  QColor c = QColor(color);
+  d_display_plot->setFillColor(which, c);
+  d_display_plot->replot();
+}
+
+void
 DisplayForm::setLineLabel(int which, const QString &label)
 {
   d_display_plot->setLineLabel(which, label);
@@ -212,6 +220,12 @@ QString
 DisplayForm::title()
 {
   return d_display_plot->getTitle();
+}
+
+QString
+DisplayForm::fillColor(int which)
+{
+  return d_display_plot->getFillColor(which).name();
 }
 
 QString

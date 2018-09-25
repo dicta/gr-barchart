@@ -71,7 +71,7 @@ VectorDisplayPlot::VectorDisplayPlot(int nplots, QWidget* parent)
     auto plottable = new QCPBars(this->xAxis, this->yAxis);
     plottable->setName(QString("Data %1").arg(i));
     plottable->setBrush(QBrush(default_colors[color_index]));
-    plottable->setPen(QPen(default_colors[color_index]));
+    plottable->setPen(QColor(Qt::black));
   }
 
   this->xAxis->setLabel(d_x_axis_label);
@@ -296,6 +296,25 @@ VectorDisplayPlot::getLineLabel(int which)
 }
 
 void
+VectorDisplayPlot::setFillColor(int which, QColor color)
+{
+  if (which < d_nplots) {
+    // Set the color of the brush
+    QBrush brush(plottable(which)->brush());
+    brush.setColor(color);
+    plottable(which)->setBrush(brush);
+  }
+}
+
+QColor
+VectorDisplayPlot::getFillColor(int which) const
+{
+  // If that plot doesn't exist then return black.
+  return (which < d_nplots) ? plottable(which)->brush().color() : QColor("black");
+}
+
+
+void
 VectorDisplayPlot::setLineColor(int which, QColor color)
 {
   if (which < d_nplots) {
@@ -352,13 +371,13 @@ VectorDisplayPlot::setMarkerAlpha(int which, int alpha)
 {
   if (which < d_nplots) {
     // Get the pen color
-    QPen pen(plottable(which)->pen());
-    QColor color = pen.color();
+    QBrush brush(plottable(which)->brush());
+    QColor color = brush.color();
 
     // Set new alpha and update pen
     color.setAlpha(alpha);
-    pen.setColor(color);
-    plottable(which)->setPen(pen);
+    brush.setColor(color);
+    plottable(which)->setBrush(brush);
   }
 }
 
@@ -366,7 +385,7 @@ int
 VectorDisplayPlot::getMarkerAlpha(int which) const
 {
   // If that plot doesn't exist then return transparent.
-  return (which < d_nplots) ? plottable(which)->pen().color().alpha() : 0;
+  return (which < d_nplots) ? plottable(which)->brush().color().alpha() : 0;
 }
 
 void
