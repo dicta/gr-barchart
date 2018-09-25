@@ -92,6 +92,32 @@ VectorDisplayPlot::VectorDisplayPlot(int nplots, QWidget* parent)
 
   d_ref_level = -HUGE_VAL;
 
+  // Setup legend. By default, the legend is in the inset layout of the
+  // main axis rect, but we're going to place it outside the plot.
+  // note, if only one plot, it's just a waste of space to draw the legend.
+  if (nplots > 1)
+  {
+      QCPLayoutGrid *subLayout = new QCPLayoutGrid;
+      plotLayout()->addElement(1, 1, subLayout);
+      subLayout->addElement(0, 0, legend);
+      subLayout->addElement(1, 0, new QCPLayoutElement());
+      subLayout->setRowStretchFactor(0, 0.05);
+      subLayout->setMargins(QMargins(5,5,5,5)); // 5px space around legend, else its borders can get clipped
+      legend->setVisible(true);
+
+      // set the stretch factor of the legend's column to something tiny
+      // to keep it always at whatever its minimum size is.
+      plotLayout()->setColumnStretchFactor(1, 0.01);
+
+      QFont legendFont = font();
+      legendFont.setPointSize(10);
+      legend->setFont(legendFont);
+  }
+
+  // Enable user drag to pan and wheel to zoom interactions.
+  // Axes can also be selected to allow the user to pan and zoom in one direction only.
+  setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | iSelectAxes);
+
   _resetXAxisPoints();
 
   replot();
