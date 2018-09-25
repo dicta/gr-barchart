@@ -102,8 +102,6 @@ private:
   double d_ymax;
   double d_ymin;
 
-  std::vector<double> d_xdata;
-
   QString d_x_axis_label;
   QString d_y_axis_label;
 

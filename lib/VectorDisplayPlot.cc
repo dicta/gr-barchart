@@ -57,13 +57,21 @@ VectorDisplayPlot::VectorDisplayPlot(int nplots, QWidget* parent)
   titleFont.setBold(true);
   titleFont.setPointSize(18);
 
-  d_xdata.resize(d_numPoints);
-  std::fill(d_xdata.begin(), d_xdata.end(), 0x0);
+  QList<QColor> default_colors;
+  default_colors << QColor(Qt::blue) << QColor(Qt::red) << QColor(Qt::green)
+	 << QColor(Qt::black) << QColor(Qt::cyan) << QColor(Qt::magenta)
+	 << QColor(Qt::yellow) << QColor(Qt::gray) << QColor(Qt::darkRed)
+	 << QColor(Qt::darkGreen) << QColor(Qt::darkBlue) << QColor(Qt::darkGray);
 
   // Add all of our graphs
   for (int i = 0; i < nplots; i++)
   {
-    addGraph();
+    int color_index = i % default_colors.size();
+
+    auto plottable = new QCPBars(this->xAxis, this->yAxis);
+    plottable->setName(QString("Data %1").arg(i));
+    plottable->setBrush(QBrush(default_colors[color_index]));
+    plottable->setPen(QPen(default_colors[color_index]));
   }
 
   this->xAxis->setLabel(d_x_axis_label);
@@ -81,38 +89,6 @@ VectorDisplayPlot::VectorDisplayPlot(int nplots, QWidget* parent)
   d_graph_title = new QCPTextElement(this, "", titleFont);
   plotLayout()->insertRow(0);
   plotLayout()->addElement(0, 0, d_graph_title);
-
-
-  QList<QColor> default_colors;
-  default_colors << QColor(Qt::blue) << QColor(Qt::red) << QColor(Qt::green)
-	 << QColor(Qt::black) << QColor(Qt::cyan) << QColor(Qt::magenta)
-	 << QColor(Qt::yellow) << QColor(Qt::gray) << QColor(Qt::darkRed)
-	 << QColor(Qt::darkGreen) << QColor(Qt::darkBlue) << QColor(Qt::darkGray);
-
-  // Create a curve for each input
-  // Automatically deleted when parent is deleted
-  d_ydata.clear();
-  d_ydata.resize(d_nplots);
-  for(int i = 0; i < d_nplots; i++) {
-    d_ydata[i].resize(d_numPoints, 0x0);
-
-#if 0
-    d_plot_curve.push_back(new QwtPlotCurve(QString("Data %1").arg(i)));
-    d_plot_curve[i]->attach(this);
-
-    QwtSymbol *symbol = new QwtSymbol(QwtSymbol::NoSymbol, QBrush(default_colors[i]),
-				      QPen(default_colors[i]), QSize(7,7));
-
-#if QWT_VERSION < 0x060000
-    d_plot_curve[i]->setRawData(d_xdata.data(), d_ydata[i].data(), d_numPoints);
-    d_plot_curve[i]->setSymbol(*symbol);
-#else
-    d_plot_curve[i]->setRawSamples(d_xdata.data(), d_ydata[i].data(), d_numPoints);
-    d_plot_curve[i]->setSymbol(symbol);
-#endif
-    setLineColor(i, default_colors[i]);
-#endif
-  }
 
   d_ref_level = -HUGE_VAL;
 
@@ -226,18 +202,32 @@ VectorDisplayPlot::plotNewData(
 ) {
   if(!d_stop) {
     if(numDataPoints > 0) {
-
-// FIXME IMPLEMENT
-      _resetXAxisPoints();
-
+      if(numDataPoints != d_numPoints)
+      {
+          d_numPoints = numDataPoints;
+          _resetXAxisPoints();
+      }
       double bottom=1e20, top=-1e20;
+
       for(int n = 0; n < d_nplots; n++) {
+        QCPBars* bars = dynamic_cast<QCPBars*>(plottable(n));
+        if (!bars)
+        {
+            continue; // we're something else
+        }
+        QVector<double> keys(numDataPoints);
+        QVector<double> values(numDataPoints);
         for(int64_t point = 0; point < numDataPoints; point++) {
+            keys[point] = d_x_axis_start + point * d_x_axis_step;
+            values[point] = dataPoints[n][point];
+
             // Find overall top and bottom values in plot.
             // Used for autoscaling y-axis.
-            bottom = std::min(bottom, dataPoints[n][point]);
-            top    = std::max(top,    dataPoints[n][point]);
+            bottom = std::min(bottom, values[point]);
+            top    = std::max(top,    values[point]);
         }
+        bars->setWidth(0.66 * d_x_axis_step); // FIXME make configurable
+        bars->setData(keys, values, true);
       }
 
       if(d_autoscale_state)
@@ -268,17 +258,13 @@ VectorDisplayPlot::setAutoScale(bool state)
 void
 VectorDisplayPlot::_resetXAxisPoints()
 {
-  for(int64_t loc = 0; loc < d_numPoints; loc++) {
-    d_xdata[loc] = d_x_axis_start + loc * d_x_axis_step;
-  }
-
-  this->xAxis->setRange(d_xdata[0], d_xdata[d_numPoints-1]);
+  this->xAxis->setRange(d_x_axis_start - 0.5 * d_x_axis_step, d_x_axis_start + d_numPoints * d_x_axis_step - 0.5 * d_x_axis_step);
 }
 
 void
 VectorDisplayPlot::setTraceColour(QColor c)
 {
-  graph(0)->setPen(QPen(c));
+  plottable(0)->setPen(QPen(c));
 }
 
 void
@@ -299,14 +285,14 @@ void
 VectorDisplayPlot::setLineLabel(int which, QString label)
 {
   if (which < d_nplots) {
-    graph(which)->setName(label);
+    plottable(which)->setName(label);
   }
 }
 
 QString
 VectorDisplayPlot::getLineLabel(int which)
 {
-  return (which < d_nplots) ? graph(which)->name() : QString();
+  return (which < d_nplots) ? plottable(which)->name() : QString();
 }
 
 void
@@ -314,9 +300,9 @@ VectorDisplayPlot::setLineColor(int which, QColor color)
 {
   if (which < d_nplots) {
     // Set the color of the pen
-    QPen pen(graph(which)->pen());
+    QPen pen(plottable(which)->pen());
     pen.setColor(color);
-    graph(which)->setPen(pen);
+    plottable(which)->setPen(pen);
   }
 }
 
@@ -324,7 +310,7 @@ QColor
 VectorDisplayPlot::getLineColor(int which) const
 {
   // If that plot doesn't exist then return black.
-  return (which < d_nplots) ? graph(which)->pen().color() : QColor("black");
+  return (which < d_nplots) ? plottable(which)->pen().color() : QColor("black");
 }
 
 
@@ -333,32 +319,32 @@ VectorDisplayPlot::setLineWidth(int which, int width)
 {
   if(which < d_nplots) {
     // Set the new line width
-    QPen pen(graph(which)->pen());
+    QPen pen(plottable(which)->pen());
     pen.setWidth(width);
-    graph(which)->setPen(pen);
+    plottable(which)->setPen(pen);
   }
 }
 
 int
 VectorDisplayPlot::getLineWidth(int which) const
 {
-  return (which < d_nplots) ? graph(which)->pen().width() : 0;
+  return (which < d_nplots) ? plottable(which)->pen().width() : 0;
 }
 
 void
 VectorDisplayPlot::setLineStyle(int which, Qt::PenStyle style)
 {
   if(which < d_nplots) {
-    QPen pen(graph(which)->pen());
+    QPen pen(plottable(which)->pen());
     pen.setStyle(style);
-    graph(which)->setPen(pen);
+    plottable(which)->setPen(pen);
   }
 }
 
 const Qt::PenStyle
 VectorDisplayPlot::getLineStyle(int which) const
 {
-  return (which < d_nplots) ? graph(which)->pen().style() : Qt::SolidLine;
+  return (which < d_nplots) ? plottable(which)->pen().style() : Qt::SolidLine;
 }
 
 void
@@ -366,13 +352,13 @@ VectorDisplayPlot::setMarkerAlpha(int which, int alpha)
 {
   if (which < d_nplots) {
     // Get the pen color
-    QPen pen(graph(which)->pen());
+    QPen pen(plottable(which)->pen());
     QColor color = pen.color();
 
     // Set new alpha and update pen
     color.setAlpha(alpha);
     pen.setColor(color);
-    graph(which)->setPen(pen);
+    plottable(which)->setPen(pen);
   }
 }
 
@@ -380,7 +366,7 @@ int
 VectorDisplayPlot::getMarkerAlpha(int which) const
 {
   // If that plot doesn't exist then return transparent.
-  return (which < d_nplots) ? graph(which)->pen().color().alpha() : 0;
+  return (which < d_nplots) ? plottable(which)->pen().color().alpha() : 0;
 }
 
 void
