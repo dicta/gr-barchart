@@ -23,8 +23,6 @@
 #ifndef DISPLAY_FORM_H
 #define DISPLAY_FORM_H
 
-#include <gnuradio/qtgui/spectrumUpdateEvents.h>
-
 #include <QtGui/QtGui>
 #include <vector>
 
