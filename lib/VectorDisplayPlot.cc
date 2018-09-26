@@ -116,7 +116,7 @@ VectorDisplayPlot::VectorDisplayPlot(int nplots, QWidget* parent)
 
   // Enable user drag to pan and wheel to zoom interactions.
   // Axes can also be selected to allow the user to pan and zoom in one direction only.
-  setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | iSelectAxes);
+  setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes);
 
   _resetXAxisPoints();
 
