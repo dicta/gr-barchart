@@ -21,7 +21,7 @@
 ########################################################################
 # Project setup
 ########################################################################
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.1)
 project(gr-barchart CXX C)
 enable_testing()
 
@@ -71,6 +71,9 @@ if(CMAKE_COMPILER_IS_GNUCXX AND NOT WIN32)
     #http://gcc.gnu.org/wiki/Visibility
     add_definitions(-fvisibility=hidden)
 endif()
+
+# Enable C++11 support
+set(CMAKE_CXX_STANDARD 11)
 
 ########################################################################
 # Find boost
