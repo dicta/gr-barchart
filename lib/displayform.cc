@@ -131,12 +131,6 @@ DisplayForm::updateGuiTimer()
 }
 
 void
-DisplayForm::onPlotPointSelected(const QPointF p)
-{
-  emit plotPointSelected(p, 3);
-}
-
-void
 DisplayForm::Reset()
 {
 }

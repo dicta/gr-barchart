@@ -73,7 +73,6 @@ public slots:
 
 private slots:
   void newData(const QEvent *updateEvent);
-  void onPlotPointSelected(const QPointF p);
 
 private:
   uint64_t d_num_real_data_points;

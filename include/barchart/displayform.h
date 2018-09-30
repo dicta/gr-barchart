@@ -90,10 +90,7 @@ private slots:
   virtual void autoScale(bool) = 0;
   void updateGuiTimer();
 
-  virtual void onPlotPointSelected(const QPointF p);
-
 signals:
-  void plotPointSelected(const QPointF p, int type);
   void toggleGrid(bool en);
 
 protected:

@@ -51,9 +51,6 @@ VectorDisplayForm::VectorDisplayForm(int nplots, QWidget* parent)
   d_clicked_x_level = 0;
 
   Reset();
-
-  connect(d_display_plot, SIGNAL(plotPointSelected(const QPointF)),
-	  this, SLOT(onPlotPointSelected(const QPointF)));
 }
 
 VectorDisplayForm::~VectorDisplayForm()
@@ -168,13 +165,6 @@ VectorDisplayForm::autoScale(bool en)
   d_autoscale_act->setChecked(en);
   getPlot()->setAutoScale(d_autoscale_state);
   getPlot()->replot();
-}
-
-void
-VectorDisplayForm::onPlotPointSelected(const QPointF p)
-{
-  d_clicked = true;
-  d_clicked_x_level = p.x();
 }
 
 bool
