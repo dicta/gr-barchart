@@ -108,8 +108,8 @@ private:
 
   QCPTextElement* d_graph_title;
 
-  bool d_stop;
-  bool d_autoscale_state;
+  bool d_stop = false;
+  bool d_autoscale_state = false;
 
   QList<QColor> d_trace_colors;
 };
