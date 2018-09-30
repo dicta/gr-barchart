@@ -26,7 +26,6 @@ self.$(id).enable_autoscale($autoscale)
 self.$(id).enable_grid($grid)
 self.$(id).set_x_axis_units($x_units)
 self.$(id).set_y_axis_units($y_units)
-self.$(id).set_ref_level($ref_level)
 
 labels = [$label1, $label2, $label3, $label4, $label5,
           $label6, $label7, $label8, $label9, $label10]
@@ -53,7 +52,6 @@ $(gui_hint()($win))</make>
   <callback>set_color($which, $color)</callback>
   <callback>set_x_axis($x_start, $x_step)</callback>
   <callback>set_y_axis($ymin, $ymax)</callback>
-  <callback>set_ref_level($ref_level)</callback>
   <callback>set_x_axis_units($x_units)</callback>
   <callback>set_y_axis_units($y_units)</callback>
 
@@ -121,13 +119,6 @@ $(gui_hint()($win))</make>
     <value>""</value>
     <type>string</type>
     <hide>'part'</hide>
-  </param>
-
-  <param>
-    <name>Ref Level</name>
-    <key>ref_level</key>
-    <value>0</value>
-    <type>real</type>
   </param>
 
   <param>

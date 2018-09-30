@@ -99,7 +99,6 @@ namespace gr {
       void set_frequency_range(const double centerfreq, const double bandwidth);
       void set_x_axis(const double start, const double step);
       void set_y_axis(double min, double max);
-      void set_ref_level(double ref_level);
 
       void set_x_axis_label(const std::string &label);
       void set_y_axis_label(const std::string &label);

@@ -90,8 +90,6 @@ VectorDisplayPlot::VectorDisplayPlot(int nplots, QWidget* parent)
   plotLayout()->insertRow(0);
   plotLayout()->addElement(0, 0, d_graph_title);
 
-  d_ref_level = -HUGE_VAL;
-
   // Setup legend. By default, the legend is in the inset layout of the
   // main axis rect, but we're going to place it outside the plot.
   // note, if only one plot, it's just a waste of space to draw the legend.
@@ -223,7 +221,6 @@ void
 VectorDisplayPlot::plotNewData(
       const std::vector<std::vector<double>>& dataPoints,
       const int64_t numDataPoints,
-      const double refLevel,
       const double timeInterval
 ) {
   if(!d_stop) {
@@ -258,8 +255,6 @@ VectorDisplayPlot::plotNewData(
 
       if(d_autoscale_state)
         _autoScale(bottom, top);
-
-      d_ref_level = refLevel;
 
       replot();
     }

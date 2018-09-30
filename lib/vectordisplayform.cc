@@ -46,7 +46,6 @@ VectorDisplayForm::VectorDisplayForm(int nplots, QWidget* parent)
   d_num_real_data_points = 1024;
   d_vecsize = 1024;
   d_vecavg = 1.0;
-  d_ref_level = 0.0;
   d_clicked = false;
   d_clicked_x_level = 0;
 
@@ -75,7 +74,6 @@ VectorDisplayForm::newData(const QEvent *updateEvent)
   getPlot()->plotNewData(
       fevent->getPoints(),
       fevent->getNumDataPoints(),
-      d_ref_level,
       d_update_time
   );
 }
@@ -109,11 +107,6 @@ void VectorDisplayForm::setXAxisLabel(const QString &label)
 void VectorDisplayForm::setYAxisLabel(const QString &label)
 {
   getPlot()->setYAxisLabel(label);
-}
-
-void VectorDisplayForm::setRefLevel(double refLevel)
-{
-  d_ref_level = refLevel;
 }
 
 void

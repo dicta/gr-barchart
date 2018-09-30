@@ -99,8 +99,6 @@ namespace gr {
       // \param step Increments per x-Axis value
       virtual void set_x_axis(const double start, const double step) = 0;
       virtual void set_y_axis(double min, double max) = 0;
-      //! The ref level is a reference line
-      virtual void set_ref_level(double ref_level) = 0;
 
       virtual void set_x_axis_label(const std::string &label) = 0;
       virtual void set_y_axis_label(const std::string &label) = 0;

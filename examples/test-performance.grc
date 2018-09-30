@@ -234,10 +234,6 @@
       <value>1</value>
     </param>
     <param>
-      <key>ref_level</key>
-      <value>5</value>
-    </param>
-    <param>
       <key>alpha1</key>
       <value>0.66</value>
     </param>

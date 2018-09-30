@@ -47,7 +47,6 @@ public:
   void plotNewData(
       const std::vector<std::vector<double>>& dataPoints,
       const int64_t numDataPoints,
-      const double refLevel,
       const double timeInterval
   );
 
@@ -113,8 +112,6 @@ private:
   bool d_autoscale_state;
 
   QList<QColor> d_trace_colors;
-
-  double d_ref_level;
 };
 
 #endif /* VECTOR_DISPLAY_PLOT_HPP */

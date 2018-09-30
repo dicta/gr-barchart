@@ -213,12 +213,6 @@ namespace gr {
     }
 
     void
-    vector_sink_f_impl::set_ref_level(double ref_level)
-    {
-      d_main_gui->setRefLevel(ref_level);
-    }
-
-    void
     vector_sink_f_impl::set_x_axis_label(const std::string &label)
     {
       d_main_gui->setXAxisLabel(label.c_str());

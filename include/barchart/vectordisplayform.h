@@ -52,7 +52,6 @@ public:
 
   void setXAxisLabel(const QString &label);
   void setYAxisLabel(const QString &label);
-  void setRefLevel(double refLevel);
 
   // returns the x-Value that was last double-clicked on by the user
   float getClickedXVal() const;
@@ -80,7 +79,6 @@ private:
 
   int d_vecsize;
   float d_vecavg;
-  double d_ref_level;
 
   // TODO do I keep these?
   bool d_clicked;
